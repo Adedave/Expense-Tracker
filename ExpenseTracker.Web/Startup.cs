@@ -79,10 +79,7 @@ namespace ExpenseTracker.Web
                 googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
                 googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
             });
-
-            var x = new DashboardFileStorage(Path.Combine(_hostingEnvironment.ContentRootPath, "App_Data", "Dashboards"));
-            var b = x as IDashboardStorage;
-            var c = b.GetAvailableDashboardsInfo();
+            
 
             services.AddMvc(options =>
             { 
@@ -90,20 +87,14 @@ namespace ExpenseTracker.Web
                 .RequireAuthenticatedUser().Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
             })
-            .AddDefaultDashboardController(configurator => {
-                configurator.SetDashboardStorage(x);
-                //configurator.SetDashboardStorage(new DashboardFileStorage(FileProvider.GetFileInfo("App_Data/Dashboards").PhysicalPath));
-                configurator.SetConnectionStringsProvider(new DashboardConnectionStringsProvider(Configuration));
-            })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddDevExpressControls(settings => settings.Resources = ResourcesType.ThirdParty | ResourcesType.DevExtreme);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseDevExpressControls();
+            //app.UseDevExpressControls();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
