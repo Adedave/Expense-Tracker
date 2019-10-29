@@ -1,0 +1,184 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Basic Page Needs
+    ================================================== -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>@ViewData["Title"] | ExpenseTracker</title>
+    <meta name="description" content="ExpenseTracker - Freebie HTML/CSS template based on Bootstrap">
+    <meta name="author" content="Milan Savov">
+    <meta name="keywords" content="html, css, twitter bootstrap, javascript, jquery, responsive">
+
+    <link rel="stylesheet" href="~/css/fontawesome.css">
+    <link rel="stylesheet" href="~/css/solid.css">
+    <link href="~/css/site.css" rel="stylesheet" />
+
+    <!-- DevExtreme themes -->
+    <link rel="stylesheet" href="~/css/devextreme/dx.common.css">
+    <link rel="stylesheet" href="~/css/devextreme/dx.light.css">
+
+    <!-- DevExtreme library -->
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+
+    <script type="text/javascript" src="~/js/devextreme/dx.all.js"></script>
+
+    <script src="~/js/devextreme/cldr.js"></script>
+    <script src="~/js/devextreme/cldr/event.js"></script>
+    <script src="~/js/devextreme/cldr/supplemental.js"></script>
+    <script src="~/js/devextreme/cldr/unresolved.js"></script>
+
+    <script src="~/js/devextreme/globalize.js"></script>
+    <script src="~/js/devextreme/globalize/message.js"></script>
+    <script src="~/js/devextreme/globalize/number.js"></script>
+    <script src="~/js/devextreme/globalize/currency.js"></script>
+    <script src="~/js/devextreme/globalize/date.js"></script>
+
+    <script src="~/js/devextreme/aspnet/dx.aspnet.mvc.js"></script>
+    <script src="~/js/devextreme/aspnet/dx.aspnet.data.js"></script>
+    <!-- Mobile Specific Metas
+    ================================================== -->
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
+    <!-- Favicon
+    ================================================== -->
+    <link rel="apple-touch-icon" sizes="180x180" href="~/assets/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="~/assets/img/ET_Favicon.png">
+    <!-- Stylesheets
+    ================================================== -->
+    <!-- Bootstrap core CSS -->
+    <link href="~/assets/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <link href="~/assets/css/style.css" rel="stylesheet">
+    <link href="~/assets/css/responsive.css" rel="stylesheet">
+    <link href="~/assets/css/colors.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <header id="masthead" class="site-header site-header-fill">
+        <nav id="primary-navigation" class="site-navigation">
+            <div class="container-fluid">
+                <div class="navbar-header">
+
+                    <a asp-action="Index" asp-controller="Home" class="site-title yellow-text">Expense<span class="white-text">Tracker</span></a>
+                </div><!-- /.navbar-header -->
+                <div class="main-menu" id="Tracker-navbar-collapse">
+                    <ul id="main-nav-ul" class="nav navbar-nav navbar-right">
+                        <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "Home" ? "active" : "")"><a asp-action="Index" asp-controller="Home">Home</a></li>
+                        <partial name="_LoginPartial" />
+
+                    </ul><!-- /.navbar-nav -->
+                </div><!-- /.navbar-collapse -->
+
+            </div>
+
+        </nav><!-- /.site-navigation -->
+
+    </header><!-- /#masthead -->
+
+    <main id="main" class="site-main">
+        <section class="site-section-small section-portfolio-item">
+            <div class="container">
+                @RenderBody()
+            </div>
+        </section><!-- /.social-networks -->
+    </main><!-- /.site-main -->
+    
+    <footer id="colophon" class="site-footer">
+        <hr style="color:lightgray" />
+        <div class="container">
+            <div class="email">
+                <a href="mailto:hello@ExpenseTracker.com">hello@ExpenseTracker.com</a>
+            </div><!-- /.email -->
+            <div class="row">
+                <div class="col-md-3 col-xs-6">
+                    <div class="mb-xs-20">
+                        <a asp-action="Index" asp-controller="Home" class="site-title yellow-text">Expense<span>Tracker</span></a>
+                        <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt</p>
+                    </div>
+
+                </div>
+                <div class="col-md-3 col-xs-6">
+                    <div class="mb-xs-20">
+                        <h4 class="small-title">Get in touch</h4>
+                        <ul class="list-unstyled">
+                            <li>Phone: <a href="tel:+15417543010">+1-541-754-3010</a></li>
+                            <li>Email: <a href="mailto:hello@ExpenseTracker.com">hello@ExpenseTracker.com</a></li>
+                            <li>Fax: <a href="tel:+15417543010">+1-541-754-3010</a></li>
+                        </ul><!-- /.list-unstyled -->
+                    </div>
+
+                </div>
+
+                <div class="col-md-3 col-xs-6">
+                    <div class="mb-xs-20">
+                        <h4 class="small-title">Links</h4>
+                        <ul class="list-unstyled">
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Blog</a></li>
+                            <li><a href="#">Contact</a></li>
+                        </ul><!-- /.list-unstyled -->
+                    </div>
+
+                </div>
+                <div class="col-md-3 col-xs-6">
+                    <div class="mb-xs-20">
+                        <h4 class="small-title">Location</h4>
+                        <ul class="list-unstyled">
+                            <li>ExpenseTracker</li>
+                            <li>848 Boston Street Hayward,</li>
+                            <li>CA 94544</li>
+                        </ul><!-- /.list-unstyled -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="copyright">
+            <p>&copy;  @DateTime.Now.Year ExpenseTracker | Made by <a href="https://milansavov.com/" class="yellow-text">Milan Savov</a></p>
+        </div><!-- /.copyright -->
+
+    </footer><!-- /.site-footer -->
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="~/assets/js/jquery.slicknav.min.js"></script>
+    <script src="~/assets/js/slick.min.js"></script>
+    <script src="~/assets/js/touchswipe.min.js"></script>
+    <script src="~/assets/js/skrollr.min.js"></script>
+    <script src="~/assets/js/jquery.countTo.min.js"></script>
+    <script src="~/assets/js/script.js"></script>
+    <script src="~/assets/js/bootstrap.min.js"></script>
+    <script>
+       
+        // Get the container element
+        var listContainer = document.getElementById("main-nav-ul");
+
+        // Get all buttons with class="btn" inside the container
+        var lists = listContainer.getElementsByClassName("nav-item");
+
+        // Loop through the buttons and add the active class to the current/clicked button
+        for (var i = 0; i < lists.length; i++) {
+            lists[i].addEventListener("click", function () {
+                var current = document.getElementsByClassName("active");
+
+                // If there's no active class
+                if (current.length > 0) {
+                    current[0].className = current[0].className.replace(" active", "");
+                }
+
+                // Add the active class to the current/clicked button
+                this.className += " active";
+            });
+        }
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

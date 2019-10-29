@@ -1,0 +1,157 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<style>
+
+    #pie-chart {
+        height: 440px;
+    }
+
+    .state-tooltip {
+        height: 90px;
+    }
+
+        .state-tooltip > img {
+            width: 60px;
+            height: 40px;
+            display: block;
+            margin: 0 5px 0 0;
+            float: left;
+        }
+
+        .state-tooltip > h4 {
+            line-height: 40px;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .state-tooltip .caption {
+            font-weight: 500;
+        }
+
+        .state-tooltip sup {
+            font-size: 0.8em;
+            vertical-align: super;
+            line-height: 0;
+        }
+
+    #choose-temperature {
+        float: right;
+    }
+
+    .action {
+        width: 420px;
+        margin-top: 20px;
+    }
+
+    .templabel {
+        padding-top: 9px;
+    }
+</style>
+<form asp-action="CreateBudget" method="post">
+    <div class="form-group">
+        <label class="control-label">Year</label>
+        @Html.DropDownList("year", new SelectList(new[] { "2016","2017","2018","2019"}), "Select  Year", new { year = "year", @class = "validate-select form-control" })
+        @*<input asp-for="TimePeriod" type="date" class="form-control" value="@DateTime.Now" />*@
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+</form>
+
+
+@(Html.DevExtreme().PieChart()
+            .ID("pie-chart")
+            .Palette(VizPalette.Bright)
+            .Title($"Expenses in {DateTime.Now.ToString("MMMM")} {DateTime.Now.Year}")
+            //.DataSourceOptions(dso => dso.Filter($"['month', '==', {DateTime.Now.ToString("MMMM")}]"))
+            .Series(s => s
+                .Add()
+                .ArgumentField("CategoryName")
+                .ValueField("CostOfTOtalExpenses")
+            )
+            .Export(e => e.Enabled(true))
+            .Tooltip(t => t
+                .Enabled(true)
+                .CustomizeTooltip(@<text>
+                    function (args) {
+                    return {
+                    html: "<div class='state-tooltip'>" +
+                        "<h4>" + args.argument  +
+                            "</h4><div>" +
+                            "<span class='caption'>Total Cost of Expenses</span>: " +
+                            new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(this.value) +
+                            "<br/><span class='caption'>For: @DateTime.Now.ToString("MMMM")  @DateTime.Now.Year </span> " +
+                            "</div>" +
+                        "</div>"
+                    };
+                    }
+                </text>)
+)
+                .DataSource(d => d
+                    .StaticJson()
+                    .Url(Url.Action("GetCategoryDetails", "Category",
+                    new { month = DateTime.Now.ToString("MMMM"),year = DateTime.Now.Year }))
+                ))
+
+
+@*<div class="controls-pane">
+    @(Html.DevExtreme().SelectBox()
+                .ID("region")
+                .Width(250)
+                .DisplayExpr("Region")
+                .ValueExpr("Region")
+                .Placeholder("Choose region")
+                .DataSource(Model)
+                .OnValueChanged(@<text>
+                    function(data) {
+                    var chart = $("#chart").dxPieChart("instance");
+                    chart.getAllSeries()[0].getPointsByArg(data.value)[0].showTooltip();
+                    }
+                </text>)
+    )
+</div>*@
+
+<div class="action">
+    @(Html.DevExtreme().SelectBox()
+                .ID("choose-temperature")
+                .DataSource(new[] { "January", "February", "March", "April", "May",
+                    "June", "July", "August", "September", "October","November","December" })
+                .Width(250)
+                .Value(DateTime.Now.ToString("MMMM"))
+                .OnValueChanged(@<text>
+                    function(data) {
+                     var serviceUrl = "http://localhost:5000/Category";
+                    var ss = data.value;
+                    $("#pie-chart").dxPieChart({
+                    dataSource: DevExpress.data.AspNet.createStore({
+                    key: "ID",
+                    loadUrl: serviceUrl + "/GetCategoryDetails?month=" + data.value +"&year=2019",
+                    insertUrl: serviceUrl + "/InsertAction",
+                    }),
+                    title: "Expenses in " + data.value + " " + @DateTime.Now.Year,
+                    tooltip: {
+                        enabled: true,
+                        customizeTooltip: function (data,des=ss) {
+                        return {
+                            html: "<div class='state-tooltip'>" +
+                        "<h4>" + data.argument  +
+                            "</h4><div>" +
+                            "<span class='caption'>Total Cost of Expenses</span>: " +
+                            new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(this.value) +
+                            "<br/><span class='caption'>For: " + des + " " +  @DateTime.Now.Year +
+                            "</span></div>" +
+                        "</div>"
+                                };
+                        }
+                    }
+                    })
+                    }
+                </text>)
+    )
+    <div id="Month" class="templabel">
+        Choose a Month:
+    </div>
+</div>

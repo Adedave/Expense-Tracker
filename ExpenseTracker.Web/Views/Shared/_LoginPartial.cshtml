@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "Expenses" ? "active" : "")"><a asp-controller="Expenses" asp-action="Index" class="nav-link">Expenses</a></li>
+    <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "ExpensesCategory" ? "active" : "")"><a asp-controller="ExpensesCategory" asp-action="Index" class="nav-link">Categories</a></li>
+    <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "Budget" ? "active" : "")"><a asp-controller="Budget" asp-action="Index" class="nav-link">Budgets</a></li>
+    <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "Reminder" ? "active" : "")"><a asp-controller="Reminder" asp-action="Index" class="nav-link">Reminders</a></li>
+    <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "BankAccount" ? "active" : "")"><a asp-controller="BankAccount" asp-action="Index" class="nav-link">Bank Accounts</a></li>
+    <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "BankTransaction" ? "active" : "")"><a asp-controller="BankTransaction" asp-action="Index" class="nav-link">Bank Transactions</a></li>
+    @*<li class="nav-item"><a class="nav-link text-primary" href="#">Hello @UserManager.GetUserName(User) ! </a></li>*@
+    <li class="nav-item">
+        <a class="nav-link text-danger" asp-controller="Account" asp-action="Logout">Logout</a>
+    </li>
+}
+else
+{
+    <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "BankAccount" ? "active" : "")"><a href="#">About Us</a></li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Blog <i class="fa fa-angle-down hidden-xs" aria-hidden="true"></i></a>
+        <ul class="dropdown-menu">
+            <li><a href="#">Blog Post</a></li>
+        </ul><!-- /.dropdown-menu -->
+    </li><!-- /.dropdown -->
+    <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "BankAccount" ? "active" : "")"><a href="#">Contact</a></li>
+    <li class="nav-item @(ViewContext.RouteData.Values["Action"].ToString() == "Register" ? "active" : "")"><a class="nav-link text-dark" title="Register" asp-action="Register" asp-controller="Account">Register</a></li>
+    <li class="nav-item @(ViewContext.RouteData.Values["Action"].ToString() == "Login" ? "active" : "")"><a class="nav-link text-dark" title="Login" asp-action="Login" asp-controller="Account" asp-fragment="login">Login</a></li>
+}

@@ -1,0 +1,65 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model List<BankTransaction>
+@{
+}
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>
+                S/N
+            </th>
+            <th>
+                Description
+            </th>
+            <th>
+                Transaction Type
+            </th>
+            <th>
+                Transaction Amount
+            </th>
+            <th>
+                Date Of Transaction
+            </th>
+            <th>
+                Remarks
+            </th>
+            <th>
+                Subject
+            </th>
+        </tr>
+    </thead>   
+    
+    <tbody>
+        @{int i = 0;}
+        @foreach (var item in Model)
+        {
+            i++;
+        <tr>
+            <td>@i</td>
+            <td>@item.Subject</td>
+            <td>@item.TransactionType</td>
+            <td>@item.Description</td>
+            <td>@item.TransactionAmount</td>
+            <td>@item.TransactionDate</td>
+            <td>@item.Remarks</td>
+            @{ if (item.TransactionType == "Debit")
+                {
+                    <td>@Html.ActionLink("Record Debit Transaction", "RecordExpenseTransaction", "BankTransaction", new { Id = item.BankTransactionId })</td>
+                    <td>@Html.ActionLink("Delete Debit Transaction", "DeleteTransaction", "BankTransaction", new { Id = item.BankTransactionId })</td>
+                }
+                else
+                {
+                    <td>@Html.ActionLink("Record Credit Transaction", "RecordIncomeTransaction", "BankTransaction", new { Id = item.BankTransactionId })</td>
+                    <td>@Html.ActionLink("Delete Credit Transaction", "DeleteTransaction", "BankTransaction", new { Id = item.BankTransactionId })</td>
+
+                }
+            }
+
+        </tr>
+        }
+    
+    </tbody>
+</table>

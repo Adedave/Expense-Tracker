@@ -1,0 +1,49 @@
+﻿@model BankAccountViewModel
+
+@{
+    ViewData["Title"] = "Update Bank Account";
+}
+
+<h2>Update Existing Bank Account</h2>
+<hr />
+<span>@{var str = ViewBag.Updated ?? "";} @str</span><br />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="UpdateAccount" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <span class="text-danger">
+                Kindly note that if you are providing a different email address, you would be redirected to Google's page to authenticate
+                Expense Tracker web app to have access to the same.<br /><a href="#"> Read our Privacy policy here</a>
+            </span>
+            <span class="text-danger">We only support a GT Account presently.</span><br />
+            <span class="text-danger">And, we only support a Gmail Account presently</span>
+
+            <input asp-for="AppUserId" type="hidden" />
+            <input asp-for="PreviousAlertEmail" type="hidden" />
+            <div class="form-group">
+                <label asp-for="AccountNumber" class="control-label">Bank Account Number</label>
+                <input asp-for="AccountNumber" placeholder="NUBAN Account Number"
+                       required class="form-control" />
+                <span asp-validation-for="AccountNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BankName" class="control-label">The Name of your Bank</label>
+                <select name="BankName" class="form-control">
+                    <option value="GTBank">GTBank</option>
+                </select>
+                <span asp-validation-for="BankName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AlertEmail" class="control-label">Email Address for Bank Alerts</label>
+                <input asp-for="AlertEmail" required type="email" class="form-control" />
+                <span asp-validation-for="AlertEmail" class="text-danger"></span>
+
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Update" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-primary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+

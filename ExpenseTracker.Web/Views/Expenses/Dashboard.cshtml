@@ -1,0 +1,50 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@using ExpenseTracker.Data.Domain.Models
+
+
+<h1>Index</h1>
+
+
+
+<a asp-action="AddExpenses" asp-controller="Expenses"> Add Expenses</a>
+
+<a asp-action="AddCategory" asp-controller="Category"> Add Category</a>
+
+<h2>Home</h2>
+
+@(Html.DevExtreme().DataGrid<Expense>()
+                    .ElementAttr(new { @class = "dx-card wide-card" })
+                    .DataSource(d => d.Mvc()
+                        .Controller("Expenses")
+                        .LoadAction("Get").Key("id")
+                    )
+                    .ShowBorders(false)
+                    .FilterRow(f => f.Visible(true))
+                    .FocusedRowEnabled(true)
+                    .FocusedRowIndex(0)
+                    .ColumnAutoWidth(true)
+                    .ColumnHidingEnabled(true)
+                    .Columns(columns =>
+                    {
+                        columns.AddFor(m => m.NameOfExpense);
+                        columns.AddFor(m => m.DateOfExpense)
+                        .DataType(GridColumnDataType.Date)
+                        .Format(Format.LongDateLongTime);
+                        columns.AddFor(m => m.CostOfExpense)
+                        .DataType(GridColumnDataType.Number)
+                        .Format(Format.Currency);
+                        columns.AddFor(m => m.ExpenseCategoryId)
+                        .DataType(GridColumnDataType.Number);
+                    })
+                    .Paging(p => p.PageSize(10))
+                    .Pager(p => p
+                        .ShowPageSizeSelector(true)
+                        .AllowedPageSizes(new[] { 5, 10, 20 })
+                        .ShowInfo(true)
+                    )
+)

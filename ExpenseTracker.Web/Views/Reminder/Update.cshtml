@@ -1,0 +1,53 @@
+﻿@model Reminder
+
+@{
+    ViewData["Title"] = "Edit Reminder";
+}
+
+<h2>Edit Reminder</h2>
+<hr />
+<span>@{var str = ViewBag.Edited ?? "";} @str</span><br />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Update">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <input asp-for="AppUserId" type="hidden" class="form-control" />
+            </div>
+
+            <div id="reminderTime" class="form-group">
+                <label asp-for="ReminderTime" class="control-label">Reminder Time</label>
+                <input type="time" name="ReminderTime" required value="@Model.ReminderTime.ToString("HH:mm:ss")" class="form-control" />
+                <span asp-validation-for="ReminderTime" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ReminderMessage" class="control-label">Reminder Message</label>
+                <input asp-for="ReminderMessage" required placeholder="Eg: Record your expenses on the Expense Tracker App" class="form-control" />
+                @*<textarea rows="4" cols="50" required name="ReminderMessage"   class="form-control"></textarea>*@
+                <span asp-validation-for="ReminderMessage" class="text-danger"></span>
+            </div>
+            @*<div class="form-group">
+                    <label asp-for="ReminderInterval" class="control-label">Reminder Interval</label>
+                    <select id="reminderInterval" onchange="WeeklyFunction()">
+                        <option value="Daily">Daily</option>
+                        <option value="Weekly">Weekly</option>
+                    </select>
+                    <span asp-validation-for="ReminderInterval" class="text-danger"></span>
+                </div>*@
+
+            @*@Html.DropDownListFor(m => m.Day, new SelectList(new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday","Saturday","Sunday" }
+                ,Model.Day ), new { Month = "Month", @class = " form-control" })*@
+
+            <div class="form-group">
+                <a asp-action="Index" class="btn btn-primary">Cancel</a>
+                <input type="submit" value="Update" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

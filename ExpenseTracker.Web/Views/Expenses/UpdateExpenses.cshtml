@@ -1,0 +1,68 @@
+﻿@model Expense
+@inject IExpenseCategoryService Categories
+@{
+    ViewData["Title"] = "Update Expenses";
+}
+
+<h1>Update Expenses</h1>
+
+<span>@{var str = ViewBag.Updated ?? "";} @str</span><br />
+<span class="text-danger">@{var exc = ViewBag.BudgetMessage ?? "";} @exc</span>
+@if (!(ViewBag.IsBudgetSet ?? true))
+{
+    <p class="text-danger"><strong>
+    Your have not created a Budget for @Model.DateOfExpense.ToString("MMMM") for  this Category<br/>
+    Consider setting a Budget <a asp-action="CreateBudget" asp-controller="Budget"
+                                 asp-route-month="@Model.DateOfExpense.ToString("MMMM")" asp-route-year="@Model.DateOfExpense.Year"
+                                 asp-route-categoryId="@Model.ExpenseCategoryId">here</a>
+</strong></p>
+}
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="UpdateExpenses" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <input asp-for="Id" type="hidden" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <input asp-for="AppUserId" type="hidden" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="NameOfExpense" class="control-label"></label>
+                <input asp-for="NameOfExpense" class="form-control" />
+                <span asp-validation-for="NameOfExpense" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CostOfExpense" class="control-label"></label>
+                <input asp-for="CostOfExpense" class="form-control" />
+                <span asp-validation-for="CostOfExpense" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Expense Category*</label>
+                @Html.DropDownList("ExpenseCategoryId", new SelectList(Categories.GetCategories(Model.AppUserId), "Id", "Name"), "select  category", new { id = "ExpenseCategoryId", @class = "validate-select form-control" })
+                <span asp-validation-for="ExpenseCategoryId" class="text-danger"></span>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label asp-for="DateOfExpense" class="control-label"></label>
+                <input asp-for="DateOfExpense" required type="date" class="form-control" />
+                <span asp-validation-for="DateOfExpense" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <a asp-action="Index" class="btn btn-primary">Cancel</a>
+
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

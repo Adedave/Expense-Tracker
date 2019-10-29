@@ -1,0 +1,68 @@
+﻿@model RegisterViewModel
+<style>
+    .wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .inner {
+        position: relative;
+        width: 535px;
+        border: double yellow 2px;
+        padding: 50px;
+    }
+</style>
+<h2 class="text-dark">@{var confirm = ViewBag.ConfirmEmail ?? " ";} @confirm</h2>
+<div style="max-width:100%;">
+    <div style="width:10%;margin:auto">
+        <h2>Register</h2>
+    </div>
+</div>
+
+<div asp-validation-summary=" All" class="text-danger"></div>
+<div class="wrapper">
+    <div class="inner">
+        <form asp-action="Register" method="post">
+            <div class="form-group">
+                <label asp-for="FirstName"></label>
+                <input asp-for="FirstName" class="form-control" placeholder="First name" />
+                <label asp-for="LastName"></label>
+                <input asp-for="LastName" class="form-control" placeholder="Last name" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" class="form-control" placeholder="email@example.com" />
+            </div>
+
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input asp-for="PhoneNumber" class="form-control" placeholder="Phone Number" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Password"></label>
+                <input asp-for="Password" class="form-control" placeholder="Password(Must be at least 6 characters)" />
+            </div>
+
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password" />
+            </div>
+
+            <div class="form-check checkbox form-check-inline">
+                <input class="form-check-input" name="TermsAndConditions" value="true" type="checkbox" id="isAgreed">
+                <label class="form-check-label" for="TermsAndConditions"> I agree to <a class="yellow-text" style="text-decoration:underline;">the Terms and Condition</a></label>
+            </div>
+            <br />
+            <a asp-action="Index" class="btn btn-secondary" style="background-color:indianred;">Cancel</a>
+            <button type="submit" class="btn btn-yellow">Register</button>
+            <div class="form-group">
+                <p>
+                    <a asp-action="Login">Existing User?</a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>

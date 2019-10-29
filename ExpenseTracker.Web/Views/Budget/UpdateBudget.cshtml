@@ -1,0 +1,36 @@
+﻿@model Budget
+@inject IExpenseCategoryService Categories
+@{
+    ViewData["Title"] = "Edit Budget";
+}
+
+<h1>Edit Budget</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Update">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input asp-for="Id" type="hidden" class="form-control" />
+            <input asp-for="AppUserId" type="hidden" class="form-control" />
+            <label class="control-label">Category</label>
+            @*<input value="@Model.Category?.Name" class="form-control" />*@
+            @Html.DropDownListFor(m => m.ExpenseCategoryId, new SelectList(Categories.GetCategories(Model.AppUserId), "Id", "Name", Model.ExpenseCategoryId), "select  category", new { id = "expenseCategoryId", @class = " form-control", required = (string)null })
+            <input asp-for="Month" type="hidden" class="form-control" />
+            <input asp-for="Year" type="hidden" class="form-control" />
+
+            <div class="form-group">
+                <label asp-for="Amount" class="control-label"></label>
+                <input asp-for="Amount" required class="form-control" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <a asp-action="Index" class="btn btn-primary">Cancel</a>
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+

@@ -1,0 +1,30 @@
+﻿
+
+
+
+@model string
+@{
+    ViewData["Title"] = "Kindly confirm Registration";
+}
+
+<h2>@ViewData["Title"]</h2>
+<div>
+    <p>
+        <h4>An email has been sent to your registered email with a confirmation link.</h4><br />
+        <h4>Kindly login to your email to confirm your registration.</h4><br />
+        @*<span>Remmeber to add us to your contact list.</span>*@
+        <h4>If you dont find it in your Inbox, kindly check your spam folder and add us to your contact list.</h4>
+        @if (Model != null)
+        {
+            <br />
+            <h3>
+                Or request a new confirmation email
+                <a asp-action="ResendConfirmationEmailAsync" asp-route-email="@Model">
+                    here
+                </a>
+            </h3>
+        }
+
+    </p>
+</div>
+

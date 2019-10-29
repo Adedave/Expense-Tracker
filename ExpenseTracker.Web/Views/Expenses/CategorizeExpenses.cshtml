@@ -1,0 +1,81 @@
+﻿@model IEnumerable<Expense>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Expenses By Date</h1>
+
+<h3><a asp-action="AddExpenses">Add New Expense</a></h3>
+<h3><a asp-action="CategorizeExpenses" asp-route-timePeriod="OneWeek">View Expenses per Week</a></h3>
+<h3><a asp-action="CategorizeExpenses" asp-route-timePeriod="OneMonth">View Expenses per Month</a></h3>
+@*<nav aria-label="Expenses Paging">
+        @await  this.Component.InvokeAsync("Pager", new {pagingList = this.Model })
+    </nav>*@
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find by category:@Html.DropDownList("categoryId", new SelectList(ViewBag.CategoryList, "Id", "Name"), "select  category", new { id = @ViewData["CurrentFilter"], @class = "validate-select form-control" })
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="Index">Back to Full List</a>
+        </p>
+    </div>
+</form>
+<table class="table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>
+                S/N
+            </th>
+            <th>
+                Expense Id
+            </th>
+            <th>
+                EXPENSE DESCRIPTION
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["CostSortParm"]" asp-route-currentIdFilter="@ViewData["CurrentFilter"]">COST OF EXPENSE</a>
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["CatIdSortParm"]" asp-route-currentIdFilter="@ViewData["CurrentFilter"]">EXPENSE CATEGORY</a>
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]" asp-route-currentIdFilter="@ViewData["CurrentFilter"]">DATE OF EXPENSE</a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{int i = 0;}
+        @foreach (var item in Model)
+        {
+            i++;
+            <tr>
+                @*@{ if (Model.PageIndex == 1)
+                    {
+                        <td>@i</td>
+                    }
+                    else
+                    {
+                        var id = i + (10 * (Model.PageIndex - 1));
+                        //if (id>)
+                        //{
+
+                        //}
+                        <td>@id</td>
+                    }
+                }*@
+                <td>@item.Id</td>
+                <td>@item.NameOfExpense</td>
+                <td>@($"{item.CostOfExpense:C2}")</td>
+                <td>
+                    @{List<IncomeCategory> categories = ViewBag.CategoryList;
+                        var category = categories.FirstOrDefault(x => x.Id == item.ExpenseCategoryId);}
+                    @category.Name
+                </td>
+                <td>@item.DateOfExpense.ToShortDateString()</td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+

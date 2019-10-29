@@ -1,0 +1,57 @@
+﻿@model Budget
+@inject IExpenseCategoryService Categories
+@{
+    ViewData["Title"] = "Create Budget";
+}
+
+<h1>Create A Budget</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="CreateBudget" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <input asp-for="AppUserId" type="hidden" class="form-control" />
+
+            <div class="form-group">
+                <label asp-for="Amount" class="control-label"></label>
+                <input asp-for="Amount" required class="form-control" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label asp-for="Month" class="control-label"></label>
+                <br />
+                @*<input asp-for="Month" required value="@DateTime.Now.ToString("MMMM")" class="form-control" />*@
+                @Html.DropDownListFor(m => m.Month, new SelectList(new[] { "January", "February", "March", "April", "May",
+"June", "July", "August", "September", "October","November","December" },Model.Month ), new { Month = "Month", @class = " form-control", required = (string)null })
+                <span asp-validation-for="Month" class="text-danger"></span>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label asp-for="Year" class="control-label"></label>
+                @*<input asp-for="Year" required class="form-control" />*@
+                 @Html.DropDownListFor(m => m.Year, new SelectList(ViewBag.Years,Model.Year), new { Year = "Year", @class = " form-control", required = (string)null })
+                <span asp-validation-for="Year" class="text-danger"></span>
+            </div>
+            <br />
+
+      
+            <div class="form-group">
+                <label class="control-label">Category</label>
+                @Html.DropDownListFor(m => m.ExpenseCategoryId, new SelectList(Categories.GetCategories(Model.AppUserId), "Id", "Name", Model.ExpenseCategoryId), "select  category", new { id = "expenseCategoryId", @class = " form-control", required=(string)null })
+                <span asp-validation-for="ExpenseCategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <a asp-action="Index" class="btn btn-primary">Cancel</a>
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<div>
+    <a asp-action="Index" asp-route-month="@Model?.Month" asp-route-year="@Model?.Year">Back to Budgets for this month</a>
+</div>

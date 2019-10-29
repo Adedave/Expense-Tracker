@@ -1,0 +1,48 @@
+﻿@model BankAccountViewModel
+
+@{
+    ViewData["Title"] = "Register New Account";
+}
+
+<h2>Register A Bank Account</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="RegisterAccount" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <span class="text-danger">
+                Kindly note that once registered, you would be redirected to Google's page to authenticate
+                Expense Tracker web app to have access to the email address you have just provided.<br /><a href="#"> Read our Privacy policy here</a>
+            </span>
+            <br/>
+            <span class="text-danger">We only support a GT Account presently.</span><br/>
+            <span class="text-danger">And, we only support a Gmail Account presently</span>
+            
+            <input asp-for="AppUserId" type="hidden" class="form-control" />
+            <div class="form-group">
+                <label asp-for="AccountNumber" class="control-label">Bank Account Number</label>
+                <input asp-for="AccountNumber" placeholder="NUBAN Account Number"
+                                                 required class="form-control" />
+                <span asp-validation-for="AccountNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BankName" class="control-label">The Name of your Bank</label>
+                <select name="BankName" class="form-control">
+                    <option value="GTBank">GTBank</option>
+                </select>
+                <span asp-validation-for="BankName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AlertEmail" class="control-label">Email Address for Bank Alerts</label>
+                <input asp-for="AlertEmail" required type="email" class="form-control" />
+                <span asp-validation-for="AlertEmail" class="text-danger"></span>
+
+            </div>
+            <div class="form-group">
+                <a asp-action="Index" class="btn btn-primary">Cancel</a>
+                <input type="submit" value="Register" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
