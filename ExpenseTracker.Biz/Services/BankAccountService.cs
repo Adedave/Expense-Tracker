@@ -69,15 +69,21 @@ namespace ExpenseTracker.Biz.Services
         public void SetIsConnectedProperty(int bankAccountId)
         {
             var bankAccount = GetById(bankAccountId);
-            bankAccount.IsConnnected = true;
-            _bankAccountRepository.Update(bankAccount);
+            if (bankAccount != null)
+            {
+                bankAccount.IsConnnected = true;
+                _bankAccountRepository.Update(bankAccount);
+            }
         }
 
         public void SetAboutToConnectProperty(string accountNumber)
         {
             var bankAccount = _bankAccountRepository.GetByAccountNumber(accountNumber);
-            bankAccount.AboutToConnect = true;
-            _bankAccountRepository.Update(bankAccount);
+            if (bankAccount != null)
+            {
+                bankAccount.AboutToConnect = true;
+                _bankAccountRepository.Update(bankAccount);
+            }
         }
     }
 }

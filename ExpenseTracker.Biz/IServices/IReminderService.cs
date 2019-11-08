@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ExpenseTracker.Biz.IServices
 {
@@ -12,6 +13,6 @@ namespace ExpenseTracker.Biz.IServices
         void Addreminder(Reminder reminder);
         void Updatereminder(Reminder reminder);
         void Deletereminder(int id);
-        void SendReminderEmail();
+        Task SendReminderEmail();
     }
 }

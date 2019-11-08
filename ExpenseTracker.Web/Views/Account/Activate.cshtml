@@ -1,0 +1,24 @@
+﻿@{
+    ViewData["Title"] = "Activate Your Account";
+}
+<div class="yellow-bg m-1 text-white" style="padding:10px;"><h2>@ViewData["Title"]</h2></div>
+
+<div>
+    <p>
+        <h3>Kindly Confirm Your Registration</h3>
+        <h4>An email has been sent to @ViewBag.Email with a confirmation link.</h4><br />
+        <h4>Kindly login to your email to confirm your registration.</h4><br />
+        <h4>If you dont find this email in your Inbox within 15 minutes, kindly check your spam folder and mark the email as "Not Spam".</h4>
+
+        <br />
+        <h3>
+            Or request a new confirmation email
+            <a asp-action="ResendConfirmationEmailAsync" asp-route-email="@ViewBag.Email">
+                here
+            </a>
+        </h3>
+
+
+    </p>
+</div>
+

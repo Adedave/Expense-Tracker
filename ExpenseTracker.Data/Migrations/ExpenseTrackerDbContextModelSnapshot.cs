@@ -55,6 +55,8 @@ namespace ExpenseTracker.Data.Migrations
 
                     b.Property<string>("FirstName");
 
+                    b.Property<bool>("IsActive");
+
                     b.Property<string>("LastName");
 
                     b.Property<bool>("LockoutEnabled");
@@ -251,6 +253,8 @@ namespace ExpenseTracker.Data.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AccessToken");
+
+                    b.Property<string>("AccountNumber");
 
                     b.Property<string>("AppUserId");
 

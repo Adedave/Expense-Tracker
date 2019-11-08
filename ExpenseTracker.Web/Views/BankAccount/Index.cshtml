@@ -8,12 +8,15 @@
     ViewData["Title"] = "Bank Accounts";
 }
 
-<a asp-action="RegisterAccount">Register A New Bank Account</a><br/>
+<h2>Bank Accounts</h2>
+<a class="btn btn-yellow" asp-action="RegisterAccount">Register A New Bank Account</a> |
 @if (Model.Count() != 0)
 {
-    <a asp-action="Index" asp-controller="BankTransaction">View your recent bank expenses</a>
+    @*<br/>*@
+    <a class="btn btn-yellow" asp-action="Index" asp-controller="BankTransaction">View your recent bank expenses</a>
 }
-<h1>Index</h1>
+    <br/>
+    <br/>
 
 <table class="table table-striped table-bordered d-sm-table-row ">
     <thead>
@@ -31,7 +34,7 @@
                 BANK ALERT EMAIL ADDRESSS
             </th>
             <th>
-                CONNECTED TO GMAIL?
+                CONNECTED TO GMAIL
             </th>
             <th>
 

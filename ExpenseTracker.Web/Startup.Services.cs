@@ -11,13 +11,32 @@ using System.Threading.Tasks;
 using ExpenseTracker.Data.Repositories;
 using ExpenseTracker.Data.IRepositories;
 using ExpenseTracker.Common;
+using Microsoft.Extensions.Configuration;
+using ExpenseTracker.Web.Configuration;
 
 namespace ExpenseTracker.Web
 {
     public partial class Startup
     {
+        private void BindAndRegisterConfigurationSettings(IConfiguration configuration, IServiceCollection services)
+        {
+            var emailSettings = new EmailSettings();
+            Configuration.Bind("EmailSettings", emailSettings);
+            services.AddSingleton<IEmailSettings>(emailSettings);
+
+            var appSettings = new AppSettings();
+            Configuration.Bind("AppSettings", appSettings);
+            services.AddSingleton(appSettings);
+
+            var oAuthConfig = new OAuthConfig();
+            Configuration.Bind("OAUTH", oAuthConfig);
+            services.AddSingleton(oAuthConfig);
+        }
+
         public void DIServicesConfiguration(IServiceCollection services)
         {
+            services.AddHttpContextAccessor();
+
             services.AddTransient<IPasswordValidator<AppUser>, CustomPasswordValidator>();
             services.AddTransient<IUserValidator<AppUser>, CustomUserValidator>();
 
@@ -43,6 +62,8 @@ namespace ExpenseTracker.Web
             services.AddTransient<IGoogleOAuthService, GoogleOAuthService>();
             
             services.AddTransient<IEmailService, EmailService>();
+
+            services.AddTransient<IViewRenderService, ViewRenderService>();
         }
     }
 }

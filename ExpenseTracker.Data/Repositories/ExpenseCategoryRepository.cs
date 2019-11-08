@@ -127,10 +127,20 @@ namespace ExpenseTracker.Data.Repositories
                 .ToList();
             return category;
         }
-
+        
         public void Insert(ExpenseCategory obj)
         {
             _context.ExpenseCategories.Add(obj);
+            _context.SaveChanges();
+        }
+
+        public void InsertWithoutSaveChanges(ExpenseCategory obj)
+        {
+            _context.ExpenseCategories.Add(obj);
+        }
+
+        public void SaveChanges()
+        {
             _context.SaveChanges();
         }
 

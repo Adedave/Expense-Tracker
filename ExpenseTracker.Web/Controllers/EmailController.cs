@@ -24,6 +24,7 @@ using System.Net;
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using ExpenseTracker.Biz.IServices;
+using ExpenseTracker.Web.Configuration;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -33,19 +34,19 @@ namespace ExpenseTracker.Web.Controllers
     public class EmailController : Controller
     {
         private readonly ExpenseTrackerDbContext _context;
-        private readonly IConfiguration _configuration;
+        private readonly OAuthConfig _oAuthConfig;
         private readonly UserManager<AppUser> _userManager;
         private readonly IBankAccountService _bankAccountService;
         private readonly IGoogleOAuthService _googleOAuthService;
 
-        public EmailController(ExpenseTrackerDbContext context,IConfiguration configuration, 
+        public EmailController(ExpenseTrackerDbContext context,OAuthConfig oAuthConfig, 
             UserManager<AppUser> userManager, IBankAccountService bankAccountService, IGoogleOAuthService googleOAuthService)
         {
             _userManager = userManager;
             _bankAccountService = bankAccountService;
             _googleOAuthService = googleOAuthService;
             _context = context;
-            _configuration = configuration;
+            _oAuthConfig = oAuthConfig;
         }
         // GET: /<controller>/
         private BankAccount _bankAccount;
@@ -58,33 +59,46 @@ namespace ExpenseTracker.Web.Controllers
 
         public async Task<IActionResult> Index(string code)
         {
-            var appUser = await GetCurrentUser();
+            try
+            {
+                //to check for direct access to this action without {code} or redirection from google's oauth page
+                if (code == null)
+                {
+                    return RedirectToAction("Index", "BankAccount");
+                }
+                var appUser = await GetCurrentUser();
 
-            //string authCode = code;
-            GoogleAuth googleAuth = await GetAccessToken(code);
-            BankAccount bankAccount = await FindBankAccount();
-            //fix here
-            googleAuth = AddOAuthProp(appUser.Id,bankAccount.AlertEmail, googleAuth);
-            SaveGoogleOAuth(googleAuth);
+                //string authCode = code;
+                GoogleAuth googleAuth = await GetAccessToken(code);
+                BankAccount bankAccount = await FindBankAccount();
+                //fix here
+                googleAuth = AddOAuthProp(appUser.Id, bankAccount?.AlertEmail, bankAccount?.AccountNumber, googleAuth);
+                SaveGoogleOAuth(googleAuth);
 
-            //if bankaccount is equals to null redirect to bank account not found page
-            //set IsConnected property for the bank account
-            _bankAccountService.SetIsConnectedProperty(bankAccount.BankAccountId);
-
-           return RedirectToAction("Index", "BankAccount");
+                //if bankaccount is equals to null redirect to bank account not found page
+                //set IsConnected property for the bank account
+                _bankAccountService.SetIsConnectedProperty(bankAccount.BankAccountId);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+            return RedirectToAction("Index", "BankAccount");
+            
         }
 
-        private GoogleAuth AddOAuthProp(string id, string alertEmail, GoogleAuth googleAuth)
+        private GoogleAuth AddOAuthProp(string id, string alertEmail, string accNumber, GoogleAuth googleAuth)
         {
             googleAuth.AppUserId = id;
             googleAuth.Email = alertEmail;
+            googleAuth.AccountNumber = accNumber;
             return googleAuth;
         }
 
         private void SaveGoogleOAuth(GoogleAuth googleAuth)
         {
-            var oauth = _googleOAuthService.GetGoogleOAuthByEmail(googleAuth?.Email);
-                //_context.GoogleAuths.FirstOrDefault(x => x.Email == googleAuth.Email);
+            var oauth = _googleOAuthService.GetGoogleOAuthByEmailAndAccNumber(googleAuth?.Email,googleAuth?.AccountNumber);
+                //_context.GoogleAuths.FirstOrDefault(x => x.Email == googleAuth?.Email);
             if (oauth != null)
             {
                _googleOAuthService.DeleteGoogleAuth(oauth);
@@ -105,7 +119,7 @@ namespace ExpenseTracker.Web.Controllers
            
             BankAccount bankAccount = await FindBankAccount(accountNumber);
 
-            GoogleAuth googleAuth = await GetGoogleAuth(bankAccount?.AlertEmail);
+            GoogleAuth googleAuth = await GetGoogleAuth(bankAccount?.AlertEmail,bankAccount?.AccountNumber);
 
             List<BankTransaction> bankTransactions = new List<BankTransaction>();
 
@@ -190,9 +204,11 @@ namespace ExpenseTracker.Web.Controllers
                             {
                                 continue;
                             }
-                            BankTransaction transaction = new BankTransaction();
-                            //transaction.AccountNo = transactionDetails["AccountNo"];
-                            transaction.Subject = email.Subject;
+                            BankTransaction transaction = new BankTransaction
+                            {
+                                //transaction.AccountNo = transactionDetails["AccountNo"];
+                                Subject = email.Subject
+                            };
                             if (email.Subject.Contains("Debit", StringComparison.OrdinalIgnoreCase)
                                 || email.GetBodyAsText().Contains("Debit", StringComparison.OrdinalIgnoreCase))
                             {
@@ -252,19 +268,27 @@ namespace ExpenseTracker.Web.Controllers
             _context.SaveChanges();
         }
         
-        private async Task<GoogleAuth> GetGoogleAuth(string email)
+        private async Task<GoogleAuth> GetGoogleAuth(string email, string accNumber)
         {
-            var appUser = await GetCurrentUser();
-            var googleAuth = _context.GoogleAuths
-                        .LastOrDefault(x => x.AppUserId == appUser.Id && x.Email == email);
-            if ((DateTime.UtcNow - googleAuth.IssuedUtc).TotalHours > 1)
+            GoogleAuth googleAuth = new GoogleAuth();
+            try
             {
-                googleAuth.AccessToken = await RefreshAccessToken(googleAuth.RefreshToken);
-                googleAuth.IssuedUtc = DateTime.UtcNow;
-                UpdateGoogleOAuth(googleAuth);
+                var appUser = await GetCurrentUser();
+                googleAuth = _context.GoogleAuths
+                            .LastOrDefault(x => x.AppUserId == appUser.Id && x.Email == email && x.AccountNumber == accNumber);
+                if ((DateTime.UtcNow - googleAuth.IssuedUtc).TotalHours > 1)
+                {
+                    googleAuth.AccessToken = await RefreshAccessToken(googleAuth.RefreshToken);
+                    googleAuth.IssuedUtc = DateTime.UtcNow;
+                    UpdateGoogleOAuth(googleAuth);
+                }
+                googleAuth = _context.GoogleAuths
+                            .LastOrDefault(x => x.AppUserId == appUser.Id && x.Email == email && x.AccountNumber == accNumber);
             }
-            googleAuth = _context.GoogleAuths
-                        .LastOrDefault(x => x.AppUserId == appUser.Id && x.Email == email);
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
             return googleAuth;
         }
 
@@ -292,19 +316,26 @@ namespace ExpenseTracker.Web.Controllers
         
         private async Task<bool> VerifyTransaction(string accountNumber, DateTime transactionDate, string transactionType, decimal transactionAmount)
         {
-            var appUser = await GetCurrentUser();
             bool IsExists = false;
-            List<BankTransaction> bankTransactions = new List<BankTransaction>();
-            bankTransactions = _context.BankTransactions
-                                .Where(x => x.AppUserId == appUser.Id && x.IsDeleted == false)
-                                .ToList();
-            foreach (var item in bankTransactions)
+            try
             {
-                if (item.AccountNumber == accountNumber && item.TransactionDate == transactionDate
-                    && item.TransactionType == transactionType && item.TransactionAmount == transactionAmount)
+                var appUser = await GetCurrentUser();
+                List<BankTransaction> bankTransactions = new List<BankTransaction>();
+                bankTransactions = _context.BankTransactions
+                                    .Where(x => x.AppUserId == appUser.Id && x.IsDeleted == false)
+                                    .ToList();
+                foreach (var item in bankTransactions)
                 {
-                    IsExists = true;
+                    if (item.AccountNumber == accountNumber && item.TransactionDate == transactionDate
+                        && item.TransactionType == transactionType && item.TransactionAmount == transactionAmount)
+                    {
+                        IsExists = true;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
             return IsExists;
         }
@@ -320,11 +351,11 @@ namespace ExpenseTracker.Web.Controllers
         public IActionResult GoogleOAuth(string accountNumber)
         {
             _bankAccountService.SetAboutToConnectProperty(accountNumber);
-            string redirectUri = _configuration["OAUTH:redirectUri"];
+            string redirectUri = _oAuthConfig.RedirectUri; /* _configuration["OAUTH:redirectUri"];*/
 
-            string clientID = _configuration["OAUTH:clientID"];
+            string clientID = _oAuthConfig.ClientId;  /*_configuration["OAUTH:clientID"];*/
 
-            string clientSecret = _configuration["OAUTH:clientSecret"];
+            string clientSecret = _oAuthConfig.ClientSecret;  /*_configuration["OAUTH:clientSecret"];*/
 
 
             var clientSecrets = new ClientSecrets
@@ -350,8 +381,9 @@ namespace ExpenseTracker.Web.Controllers
             var user = await GetCurrentUser();
             if (string.IsNullOrEmpty(accountNumber))
             {
+                //it could be lastordefault should incase i have multiple about to connect
                bankAccount = _context.BankAccounts
-                            .FirstOrDefault(x => x.AppUserId == user.Id && x.AboutToConnect == true);
+                            .LastOrDefault(x => x.AppUserId == user.Id && x.AboutToConnect == true);
             }
             else
             {
@@ -364,11 +396,11 @@ namespace ExpenseTracker.Web.Controllers
         public async Task<GoogleAuth> GetAccessToken(string code)
         {
             TokenResponse tokenResponse = new TokenResponse();
-            string redirectUri = _configuration["OAUTH:redirectUri"];
+            string redirectUri = _oAuthConfig.RedirectUri; 
 
-            string clientID = _configuration["OAUTH:clientID"];
+            string clientID = _oAuthConfig.ClientId; 
 
-            string clientSecret = _configuration["OAUTH:clientSecret"];
+            string clientSecret = _oAuthConfig.ClientSecret; 
 
             string basUrl = "https://www.googleapis.com/oauth2/v4/token/";
             string body = "code=" + code + "&client_id=" + clientID + "&client_secret=" + clientSecret + "&grant_type=authorization_code&redirect_uri=" + redirectUri;
@@ -404,11 +436,12 @@ namespace ExpenseTracker.Web.Controllers
         private async Task<string> RefreshAccessToken(string refreshToken)
         {
             TokenResponse tokenResponse = new TokenResponse();
-            string redirectUri = _configuration["OAUTH:redirectUri"];
 
-            string clientID = _configuration["OAUTH:clientID"];
+            string redirectUri = _oAuthConfig.RedirectUri;
 
-            string clientSecret = _configuration["OAUTH:clientSecret"];
+            string clientID = _oAuthConfig.ClientId;
+
+            string clientSecret = _oAuthConfig.ClientSecret;
 
             string basUrl = "https://www.googleapis.com/oauth2/v4/token/";
 
@@ -448,54 +481,60 @@ namespace ExpenseTracker.Web.Controllers
 
         public Dictionary<string,string> ExtractText(string text)
         {
-            int amountIndex = text.IndexOf("Amount");
-            int accountNumberIndex = text.IndexOf("Account Number");
-            int descriptionIndex = text.IndexOf("Description");
-            int dateIndex = text.IndexOf("Value Date");
-            int timeIndex = text.IndexOf("Time of Transaction");
-            int remarksIndex = text.IndexOf("Remarks");
-            int documentNoIndex = text.IndexOf("Document Number");
-
             Dictionary<string, string> transactionDetails = new Dictionary<string, string>();
+            try
+            {
+                int amountIndex = text.IndexOf("Amount");
+                int accountNumberIndex = text.IndexOf("Account Number");
+                int descriptionIndex = text.IndexOf("Description");
+                int dateIndex = text.IndexOf("Value Date");
+                int timeIndex = text.IndexOf("Time of Transaction");
+                int remarksIndex = text.IndexOf("Remarks");
+                int documentNoIndex = text.IndexOf("Document Number");
 
-            string amount = text.Substring(amountIndex, dateIndex - amountIndex - 1).Remove(0, "Amount :".Length);
-            amount = amount.Replace("\r\n", "");
-            amount = amount.Replace(":", "");
-            amount = amount.Trim();
-            transactionDetails.Add("Amount", amount);
 
-            int transactLocationIndex = text.IndexOf("Transaction Location");
-            string accountNumber = text.Substring(accountNumberIndex, transactLocationIndex - accountNumberIndex - 1).Remove(0, "Account Number :".Length);
-            accountNumber = accountNumber.Replace("\r\n", "");
-            accountNumber = accountNumber.Replace(":", "");
-            accountNumber = accountNumber.Trim();
-            transactionDetails.Add("Account Number", accountNumber);
+                string amount = text.Substring(amountIndex, dateIndex - amountIndex - 1).Remove(0, "Amount :".Length);
+                amount = amount.Replace("\r\n", "");
+                amount = amount.Replace(":", "");
+                amount = amount.Trim();
+                transactionDetails.Add("Amount", amount);
 
-            string description = text.Substring(descriptionIndex, amountIndex - descriptionIndex - 1).Remove(0, "Description :".Length);
-            description = description.Replace("\r\n", "");
-            description = description.Replace(":", "");
-            description = description.Trim();
-            transactionDetails.Add("Description", description);
+                int transactLocationIndex = text.IndexOf("Transaction Location");
+                string accountNumber = text.Substring(accountNumberIndex, transactLocationIndex - accountNumberIndex - 1).Remove(0, "Account Number :".Length);
+                accountNumber = accountNumber.Replace("\r\n", "");
+                accountNumber = accountNumber.Replace(":", "");
+                accountNumber = accountNumber.Trim();
+                transactionDetails.Add("Account Number", accountNumber);
 
-            string date = text.Substring(dateIndex , remarksIndex - dateIndex-1).Remove(0, "Value Date :".Length);
-            date = date.Replace("\r\n", "");
-            date = date.Replace(":", "");
-            date = date.Trim();
-            transactionDetails.Add("Date", date); 
+                string description = text.Substring(descriptionIndex, amountIndex - descriptionIndex - 1).Remove(0, "Description :".Length);
+                description = description.Replace("\r\n", "");
+                description = description.Replace(":", "");
+                description = description.Trim();
+                transactionDetails.Add("Description", description);
 
-            string time = text.Substring(timeIndex, documentNoIndex - timeIndex-1).Remove(0, "Time of Transaction :".Length);
-            time = time.Replace("\r\n", "");
-            int firstIndex = time.IndexOf(':');
-            time = time.Remove(firstIndex, 1);
-            time = time.Trim();
-            transactionDetails.Add("Time", time);
+                string date = text.Substring(dateIndex , remarksIndex - dateIndex-1).Remove(0, "Value Date :".Length);
+                date = date.Replace("\r\n", "");
+                date = date.Replace(":", "");
+                date = date.Trim();
+                transactionDetails.Add("Date", date); 
 
-            string remarks = text.Substring(remarksIndex , timeIndex - remarksIndex-1).Remove(0, "Remarks :".Length);
-            remarks = remarks.Replace("\r\n", "");
-            remarks = remarks.Replace(":", "");
-            remarks = remarks.Trim();
-            transactionDetails.Add("Remarks", remarks);
+                string time = text.Substring(timeIndex, documentNoIndex - timeIndex-1).Remove(0, "Time of Transaction :".Length);
+                time = time.Replace("\r\n", "");
+                int firstIndex = time.IndexOf(':');
+                time = time.Remove(firstIndex, 1);
+                time = time.Trim();
+                transactionDetails.Add("Time", time);
 
+                string remarks = text.Substring(remarksIndex , timeIndex - remarksIndex-1).Remove(0, "Remarks :".Length);
+                remarks = remarks.Replace("\r\n", "");
+                remarks = remarks.Replace(":", "");
+                remarks = remarks.Trim();
+                transactionDetails.Add("Remarks", remarks);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
             return transactionDetails;
         }
 

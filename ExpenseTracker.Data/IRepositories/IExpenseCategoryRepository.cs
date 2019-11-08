@@ -7,6 +7,8 @@ namespace ExpenseTracker.Data.IRepositories
 {
     public interface IExpenseCategoryRepository: IRepository<ExpenseCategory>
     {
+        void InsertWithoutSaveChanges(ExpenseCategory expenseCategory);
+        void SaveChanges();
         List<ExpenseCategory> GetExpenseCategories(string userId);
         List<ExpenseCategory> GetExpenseCategoriesWithExpenses(string userId);
         List<ExpenseCategory> GetExpenseCategoriesWithCurrentMonthExpenses(string userId, string month, string year);

@@ -9,6 +9,8 @@ namespace ExpenseTracker.Biz.IServices
     {
         List<ExpenseCategory> GetCategories(string userId);
         void AddCategory(string name, string userId);
+        void AddCategoryWithoutSaveChanges(string name, string userId);
+        void SaveChanges();
         //void CopyAdminCategoriesForExistingUsers(List<string> vs);
         ExpenseCategory GetCategoryById(int id);
         void UpdateCategory(ExpenseCategory name, string userId);

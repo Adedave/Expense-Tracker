@@ -1,22 +1,12 @@
 ﻿@model Expense
 @inject IExpenseCategoryService Categories
+@inject UserManager<AppUser> UserManager
 @{
     ViewData["Title"] = "Add Expenses";
 }
 
 <h1>Add Expenses</h1>
 
-<span>@{var str = ViewBag.Added ?? "";} @str</span><br/>
-<h3><span class="text-danger">@{var exc = ViewBag.BudgetMessage ?? "";} @exc</span></h3>
-@if (!(ViewBag.IsBudgetSet??true))
-{
-<p class="text-danger"><strong>
-    Your have not created a Budget for @Model.DateOfExpense.ToString("MMMM") for this Category<br />
-    Consider setting a Budget <a asp-action="CreateBudget" asp-controller="Budget"
-                                 asp-route-month="@Model.DateOfExpense.ToString("MMMM")" asp-route-year="@Model.DateOfExpense.Year"
-                                 asp-route-categoryId="@Model.ExpenseCategoryId">here</a>
-</strong></p>
-}
 <hr />
 
 <div class="row">
@@ -35,7 +25,7 @@
 
             <div class="form-group">
                 <label asp-for="NameOfExpense" class="control-label">Name Of Expense*</label>
-                <input asp-for="NameOfExpense" required placeholder="What did you spend this amount on?" class="form-control" />
+                <input asp-for="NameOfExpense" required placeholder="@UserManager.GetUserName(User),What did you spend this amount on?" class="form-control" />
                 <span asp-validation-for="NameOfExpense" class="text-danger"></span>
             </div>
             <br />
@@ -64,14 +54,14 @@
 
             <div class="form-group">
                 <label asp-for="MoreDescription" class="control-label">More Description</label>
-                <textarea name="MoreDescription" placeholder="Write here anything else about this expense" class="form-control"></textarea>
+                <textarea name="MoreDescription" placeholder="You can write anything else here about this expense" class="form-control" rows="3"></textarea>
                 <span asp-validation-for="MoreDescription" class="text-danger"></span>
             </div>
             <br />
 
             <div class="form-group">
                 <a asp-action="Index" class="btn btn-primary">Cancel</a>
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-yellow" />
             </div>
             
         </form>

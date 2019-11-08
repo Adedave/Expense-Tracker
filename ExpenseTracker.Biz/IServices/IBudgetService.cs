@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ExpenseTracker.Biz.IServices
 {
@@ -15,5 +16,7 @@ namespace ExpenseTracker.Biz.IServices
         void AddBudget(Budget Budget);
         void UpdateBudget(Budget Budget);
         void DeleteBudget(Budget Budget);
+
+        Task SendBudgetExceededMail(string userName, string email, string budgetStatus, string category);
     }
 }

@@ -1,30 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ExpenseTracker.Data.Domain.Models;
-using ExpenseTracker.Biz.Infrastructure;
+﻿using ExpenseTracker.Data.Domain.Models;
 using ExpenseTracker.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using DevExpress.DashboardAspNetCore;
-using DevExpress.AspNetCore;
-using DevExpress.DashboardWeb;
-using Microsoft.AspNetCore.Internal;
-using System.IO;
 using Hangfire;
 using ExpenseTracker.Biz.IServices;
+using System;
 
 namespace ExpenseTracker.Web
 {
@@ -52,15 +41,28 @@ namespace ExpenseTracker.Web
             });
 
             services.ConfigureApplicationCookie(opts => opts.LoginPath = "/Account/Login");
-            services.AddHangfire(
-                    opt => opt.UseSqlServerStorage(Configuration["appSettings:ConnectionStrings:ETCS"])
-                );
+           
+            BindAndRegisterConfigurationSettings(Configuration,services);
             DIServicesConfiguration(services);
 
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+            {
+                    services.AddDbContext<ExpenseTrackerDbContext>(options =>
+                            options.UseSqlServer(Configuration.GetConnectionString("MyDbConnection")));
+                services.AddHangfire(
+                       opt => opt.UseSqlServerStorage(Configuration.GetConnectionString("MyDbConnection"))
+                   );
+            }
+            else
+            {
+                services.AddDbContext<ExpenseTrackerDbContext>(options =>
+                    options.UseSqlServer(
+                    Configuration["AppSettings:MyDbConnection"]));
 
-            services.AddDbContext<ExpenseTrackerDbContext>(options =>
-                options.UseSqlServer(
-                Configuration["appSettings:ConnectionStrings:ETCS"]));
+                services.AddHangfire(
+                        opt => opt.UseSqlServerStorage(Configuration["AppSettings:MyDbConnection"])
+                    );
+            }
 
             services.AddIdentity<AppUser, IdentityRole>(opts =>
             {
@@ -73,13 +75,15 @@ namespace ExpenseTracker.Web
                 opts.Password.RequireDigit = false;
             }).AddEntityFrameworkStores<ExpenseTrackerDbContext>()
                  .AddDefaultTokenProviders();
-
-            services.AddAuthentication().AddGoogle(googleOptions =>
-            {
-                googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
-                googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
-            });
             
+            // Automatically perform database migration
+            services.BuildServiceProvider().GetService<ExpenseTrackerDbContext>().Database.Migrate();
+            //services.AddAuthentication().AddGoogle(googleOptions =>
+            //{
+            //    googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
+            //    googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+            //});
+
 
             services.AddMvc(options =>
             { 
@@ -90,7 +94,7 @@ namespace ExpenseTracker.Web
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
         }
-
+        
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
@@ -111,8 +115,11 @@ namespace ExpenseTracker.Web
 
 
             RecurringJob.AddOrUpdate<IReminderService>(
-                        reminderEmail => reminderEmail.SendReminderEmail(), Cron.Daily(8,30));
-
+                        reminderEmail => reminderEmail.SendReminderEmail(), Cron.Minutely()
+                        );
+            RecurringJob.AddOrUpdate<IExpenseService>(
+                        expenses => expenses.SendMonthlyReport(), Cron.Monthly(1, 6, 30)
+                        );
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -123,8 +130,9 @@ namespace ExpenseTracker.Web
 
             app.UseMvc(routes =>
             {
-                // Maps a dashboard route.
-                routes.MapDashboardRoute("app_data/dashboard");
+                routes.MapRoute(
+                    name: "MyArea",
+                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
                 routes.MapRoute(
                     name: "default",

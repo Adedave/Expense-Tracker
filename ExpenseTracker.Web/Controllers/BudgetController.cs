@@ -94,6 +94,7 @@ namespace ExpenseTracker.Web.Controllers
             budget.AppUserId = user.Id;
 
             ViewBag.CategoryList = _expenseCategoryService.GetCategories(user.Id);
+            ViewBag.Years = CalculateYears();
 
             if (!ModelState.IsValid)
             {
@@ -116,7 +117,7 @@ namespace ExpenseTracker.Web.Controllers
             var budget = _budgetService.GetById(id);
             if (budget == null)
             {
-                return BadRequest();
+                return NotFound();
             }
             return View(budget);
         }
@@ -128,18 +129,24 @@ namespace ExpenseTracker.Web.Controllers
             {
                 return View(budget);
             }
+            if (_budgetService.BudgetExists(budget))
+            {
+                ModelState.AddModelError("", "A budget has already been created for this month. Consider editing it ");
+                return View(budget);
+            }
             _budgetService.UpdateBudget(budget);
             return RedirectToAction("Index", new { month = budget.Month, year = budget.Year });
         }
 
-        [HttpDelete]
+        [HttpPost]
         public IActionResult Delete(int id)
         {
             var budget = _budgetService.GetById(id);
             if (budget == null)
             {
-                return BadRequest();
+                return NotFound();
             }
+
             _budgetService.DeleteBudget(budget);
             return RedirectToAction("Index",new { month = budget.Month, year = budget.Year });
         }

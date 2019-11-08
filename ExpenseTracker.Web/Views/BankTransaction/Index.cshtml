@@ -1,29 +1,36 @@
 ﻿@model IEnumerable<BankTransaction>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Bank Transactions";
 }
 
-<h1>Index</h1>
+<h2>Bank Transactions</h2>
 <p>
-    <a asp-action="RegisterAccount" asp-controller="BankAccount">Register A New Bank Account</a>
+    <a class="btn btn-yellow" asp-action="RegisterAccount" asp-controller="BankAccount">Register A New Bank Account</a> |
+    <a class="btn btn-yellow" asp-action="Index" asp-controller="BankAccount">View Registered Bank Accounts</a>
 </p>
 <p>
-    <a asp-action="Index" asp-controller="BankAccount">View Registered Bank Accounts</a>
 </p>
 <form asp-action="GetBankTransactions" asp-controller="Email" method="get">
     <div class="form-actions no-color">
         <p>
-            Check For New Bank Transactions:@Html.DropDownList("accountNumber", new SelectList(ViewBag.BankAccounts, "AccountNumber", "AccountNumber"), "select  account", new { AccountNumber = "accountNumber", @class = "validate-select form-control" })
-            <input type="submit" value="Check" class="btn btn-default" /> 
+            <div class="form-inline" style="display:inline-table;">
+                <label>Check For New Bank Transactions:&nbsp;&nbsp;</label>@Html.DropDownList("accountNumber", new SelectList(ViewBag.BankAccounts, "AccountNumber", "AccountNumber"), "select  account", new { AccountNumber = "accountNumber", @class = "validate-select form-control" })
+                <br />
+
+                <input type="submit" value="Check" class="btn btn-yellow" />
+            </div>
         </p>
     </div>
 </form>
 <form asp-action="Index" method="get">
     <div class="form-actions no-color">
         <p>
-            Select Account:@Html.DropDownList("accountId", new SelectList(ViewBag.AccountList, "Id", "Name"), "select  account", new { Id = "accountId", @class = "validate-select form-control" })
-            <input type="submit" value="Search" class="btn btn-default" /> |
-            <a asp-action="Index">Back to Full List</a>
+            <div class="form-inline" style="display:inline-table;">
+                <label>Select Account:&nbsp;&nbsp;</label>@Html.DropDownList("accountId", new SelectList(ViewBag.AccountList, "Id", "Name"), "select  account", new { Id = "accountId", @class = "validate-select form-control" })
+            <br />
+                <input type="submit" value="Search" class="btn btn-yellow" /> |
+                <a asp-action="Index">Back to Full List</a>
+            </div>
         </p>
     </div>
 </form>
@@ -54,7 +61,7 @@
                 Remarks
             </th>
             <th>
-                Recorded?
+                Recorded
             </th>
             <th>
                 
@@ -77,7 +84,7 @@
             <td>@item.Description</td>
             <td>
                 @{var total = item.TransactionAmount.ToString("0,0.00"); }
-                @("\u20A6") @total
+                @total
             </td>
             <td>@item.AccountNumber</td>
             <td>@item.TransactionDate.ToShortDateString()</td>
@@ -87,7 +94,7 @@
             </td>
             @{ if (item.TransactionType == "Debit")
                 {
-                    <td>@Html.ActionLink("Record Debit Transaction", "RecordExpenseTransaction", "BankTransaction", new { Id = item.BankTransactionId })</td>
+                    <td>@Html.ActionLink("Record Transaction", "RecordExpenseTransaction", "BankTransaction", new { Id = item.BankTransactionId })</td>
                     <td>
                         <a id="deleteItem-@item.BankTransactionId" data-target="#myModal-@item.BankTransactionId" class="trigger-btn" data-toggle="modal"><i class="fa fa-trash"></i></a>
 

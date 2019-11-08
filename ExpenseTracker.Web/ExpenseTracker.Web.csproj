@@ -6,22 +6,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="App_Data\**" />
-    <Compile Remove="Reports\**" />
     <Content Remove="App_Data\**" />
-    <Content Remove="Reports\**" />
     <EmbeddedResource Remove="App_Data\**" />
-    <EmbeddedResource Remove="Reports\**" />
     <None Remove="App_Data\**" />
-    <None Remove="Reports\**" />
   </ItemGroup>
   <ItemGroup>
+    <Content Remove="Views\Expenses\Dashboard.cshtml" />
+    <Content Remove="Views\Expenses\Expenses.cshtml" />
     <Content Remove="Views\Shared\_NavPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DevExpress.AspNetCore.Dashboard" Version="19.1.6" />
+    <PackageReference Include="DevExpress.Map.Core" Version="19.2.3" />
+    <PackageReference Include="DevExpress.Reporting.Core" Version="19.2.3" />
     <PackageReference Include="DevExtreme.AspNet.Data" Version="2.5.1" />
     <PackageReference Include="DevExtreme.AspNet.Core" Version="19.2.3" />
-    <PackageReference Include="DevExtreme.Web" Version="19.1.6" />
+    <PackageReference Include="DevExtreme.Web" Version="19.2.3" />
     <PackageReference Include="Google.Apis.Auth" Version="1.41.1" />
     <PackageReference Include="Mail.dll" Version="3.0.19162.1801" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
@@ -36,6 +35,9 @@
   <ItemGroup>
     <ProjectReference Include="..\ExpenseTracker.Biz\ExpenseTracker.Biz.csproj" />
     <ProjectReference Include="..\ExpenseTracker.Common\ExpenseTracker.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Areas\Admin\Data\" />
   </ItemGroup>
   <ProjectExtensions>
     <VisualStudio>

@@ -9,9 +9,11 @@ namespace ExpenseTracker.Web.Models
 {
     public class RegisterViewModel
     {
-        [Required(ErrorMessage = "First Name is required")]
+        [Display(Name = "First Name")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "First Name is required")]
         public string FirstName { get; set; }
 
+        [Display(Name = "Last Name")]
         [Required(ErrorMessage = "Last Name is required")]
         public string LastName { get; set; }
 

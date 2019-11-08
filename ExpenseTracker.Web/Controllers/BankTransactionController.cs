@@ -147,11 +147,13 @@ namespace ExpenseTracker.Web.Controllers
             if (bankTransaction == null)
             {
                 ModelState.AddModelError("","Bank Transaction not found");
-                return BadRequest();
+                /*************/
+                return NotFound();
             }
             return RedirectToAction("RecordTransaction",bankTransaction);
         }
 
+        [HttpGet]
         public IActionResult RecordTransaction(BankTransaction bankTransaction)
         {
             Expense expense = new Expense
@@ -188,18 +190,31 @@ namespace ExpenseTracker.Web.Controllers
             SetBankTransactionAsRecorded(bankTransactionId);
 
             Dictionary<string, string> budgetMessage = CheckBudgetLimit(user, bankExpense);
-            if (!string.IsNullOrEmpty(budgetMessage["BudgetStatus"]) &&
-                !string.IsNullOrWhiteSpace(budgetMessage["BudgetStatus"]))
+            if (budgetMessage["IsBudgetBelowExpense"] == "false")
             {
                 //log if email was sent successfully for example if there is no internet or the mail sending failed for
                 //some other reason
                 await SendBudgetEmail(user.Email, budgetMessage["BudgetStatus"], budgetMessage["Category"]);
             }
+
+            return RedirectToAction("Details", new { id = bankExpense.Id });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var user = await GetCurrentUser();
+            var expenses = _expenseService.GetById(id);
+            Dictionary<string, string> budgetMessage = CheckBudgetLimit(user, expenses);
             ViewBag.IsBudgetSet = budgetMessage["IsBudgetSet"] == "true" ? true : false;
             ViewBag.BudgetMessage = budgetMessage["BudgetStatus"];
-            ViewBag.Added = $"A new Transaction {bankExpense.NameOfExpense} has been recorded successfully";
+            if (expenses == null)
+            {
+                ModelState.AddModelError("", "Selected expense not found!");
+                View(expenses);
+            }
 
-            return View(bankExpense);
+            return View(expenses);
         }
 
         private void SetBankTransactionAsRecorded(int bankTransactionId)
@@ -231,7 +246,7 @@ namespace ExpenseTracker.Web.Controllers
             if (bankTransaction == null)
             {
                 ModelState.AddModelError("", "Bank Transaction not found");
-                return BadRequest();
+                return NotFound();
             }
             return RedirectToAction("RecordTransaction", "Income", bankTransaction);
         }
@@ -243,7 +258,7 @@ namespace ExpenseTracker.Web.Controllers
             if (bankTransaction == null)
             {
                 ModelState.AddModelError("", "Bank Transaction not found");
-                return BadRequest();
+                return NotFound();
             }
             bankTransaction.IsDeleted = true;
             _context.Entry(bankTransaction).State = EntityState.Modified;

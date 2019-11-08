@@ -3,9 +3,29 @@
 @{
     ViewData["Title"] = "Login";
 }
-
-<div class="row" id="login">
-    <div class="col-md-6 col-md-offset-3">
+<style>
+    section {
+        /*background-color: #FFD500;*/
+    }
+    .wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .inner {
+        background-color: #FFD500;
+        position: relative;
+        width: 535px;
+        border: hidden #3B3A36 2px;
+        border-radius: 25px;
+        padding: 0px 10px;
+        /*margin-top:-50px;
+        margin-bottom:-50px;*/
+    }
+</style>
+<div class="wrapper" id="login">
+    <div class="inner">
        
         <div class="text-danger" asp-validation-summary="All"></div>
         
@@ -14,27 +34,30 @@
             <input type="hidden" name="returnUrl" value="@ViewBag.returnUrl" />
             <div class="row">
                 <div class="col-sm-12">
+                    <label>Email</label>
                     <input class="form-control" type="email" name="Email" placeholder="E-mail *" required>
                 </div>
                 <div class="col-sm-12">
+                    <label>Password</label>
                     <input class="form-control" type="password" name="Password" placeholder="Password *" required>
                 </div>
                 <div class="col-sm-12">
-                    <div class="checkbox">
-                        <input type="checkbox" name="RememberMe" value="true" id="rememberMe">
-                        <label for="rememberMe"> Remember me</label>
+                    <div class="checkbox" style="float:left;">
+                        <input style="margin:5px;" type="checkbox" name="RememberMe" value="true" id="rememberMe">
+                        <label style="margin-left:10px;" for="rememberMe"> Remember me</label>
                     </div>
                 </div>
             </div>
             <div class="text-right">
-                <button class="btn btn-yellow">Log In</button>
+                <button class="btn btn-warning">Log In</button>
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-left:10px;">
                 <p>
-                    <a asp-action="ForgotPassword">Forgot your password?</a>
+                    <a asp-action="ForgotPassword" style="color:white;float:left;" >Forgot your password?</a>
                 </p>
                 <p>
-                    <a asp-action="Register" asp-route-returnUrl="@ViewBag.returnUrl">Register as a new user</a>
+                    <br/>
+                    <a asp-action="Register" asp-route-returnUrl="@ViewBag.returnUrl" style="color:white;">Register as a new user</a>
                 </p>
             </div>
         </form><!-- form-horizontal -->

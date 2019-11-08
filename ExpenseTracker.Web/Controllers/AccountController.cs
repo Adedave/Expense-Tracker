@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,7 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using ExpenseTracker.Data.Domain.Models;
 using ExpenseTracker.Web.Models;
 using ExpenseTracker.Common;
-using System.Text.Encodings.Web;
+using ExpenseTracker.Biz.IServices;
+using System;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -20,13 +18,17 @@ namespace ExpenseTracker.Web.Controllers
         private UserManager<AppUser> _userManager;
         private readonly IEmailService _emailService;
         private SignInManager<AppUser> _signInManager;
-        public AccountController(UserManager<AppUser> userMgr,IEmailService emailService,
-        SignInManager<AppUser> signinMgr)
+        private readonly IViewRenderService _viewRenderService;
+
+        public AccountController(UserManager<AppUser> userMgr, IEmailService emailService,
+        SignInManager<AppUser> signinMgr, IViewRenderService viewRenderService)
         {
             _userManager = userMgr;
             _emailService = emailService;
             _signInManager = signinMgr;
+            _viewRenderService = viewRenderService;
         }
+
         [AllowAnonymous]
         public IActionResult Register()
         {
@@ -49,8 +51,10 @@ namespace ExpenseTracker.Web.Controllers
                     LastName = model.LastName,
                     UserName = model.Email,
                     Email = model.Email,
-                    PhoneNumber = model.PhoneNumber
+                    PhoneNumber = model.PhoneNumber,
+                    IsActive = true
                 };
+
                 IdentityResult result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -61,9 +65,8 @@ namespace ExpenseTracker.Web.Controllers
 
                     bool success = await SendConfirmationEmailAsync(user.Email, cTokenLink);
                     
-
-                    ViewBag.ConfirmEmail = success ? "Registration successful, kindly check your email to confirm your registration" : "";
-                    return View("ConfirmEmail");
+                    //ViewBag.ConfirmEmail = "Registration successful, kindly check your email to confirm your registration"; /*: "";*/
+                    return RedirectToAction("Activate", new { email = user.Email });
                 }
                 else
                 {
@@ -73,6 +76,13 @@ namespace ExpenseTracker.Web.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
+        public async Task<IActionResult> Activate(string email)
+        {
+            var appUser = await _userManager.FindByEmailAsync(email);
+            ViewBag.Email = appUser!=null ? email : "<Email Not Found>";
+            return View();
+        }
         private async Task AddUserToARoleAsync(string userEmail)
         {
             AppUser registeredUser = await _userManager.FindByEmailAsync(userEmail);
@@ -89,14 +99,19 @@ namespace ExpenseTracker.Web.Controllers
 
         private async Task<bool> SendConfirmationEmailAsync(string email, string cTokenLink)
         {
-            return await _emailService.ConfirmEmail(email, cTokenLink);
+            var appUser = await _userManager.FindByEmailAsync(email);
+            string message = await _viewRenderService.RenderToStringAsync("ConfirmEmailTemplate",email);
+            message = message.Replace("{username}", appUser.UserName);
+            message = message.Replace("{email}", appUser.Email);
+            message = message.Replace("{confirmLink}", cTokenLink);
+            return await _emailService.ConfirmEmail(appUser.Email, message );
         }
 
         [AllowAnonymous]
         public async Task<IActionResult> ResendConfirmationEmailAsync(string email)
         {
             string confirmEmailTokenLink = await GenerateEmailTokenAsync(email);
-           bool success = await SendConfirmationEmailAsync(email, confirmEmailTokenLink);
+            bool success = await SendConfirmationEmailAsync(email, confirmEmailTokenLink);
             return View("ConfirmEmail");
         }
 
@@ -153,7 +168,7 @@ namespace ExpenseTracker.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel details, string returnUrl)
         {
-            if (User.Identity.IsAuthenticated)
+            if(User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -161,11 +176,11 @@ namespace ExpenseTracker.Web.Controllers
             if (ModelState.IsValid)
             {
                 AppUser user = await _userManager.FindByEmailAsync(details.Email);
-                if (!user.EmailConfirmed)
+                if (!user.EmailConfirmed && user.IsActive == true)
                 {
-                    return View("ConfirmEmail", user.Email);
+                    return RedirectToAction("Activate", new { email = user.Email });
                 }
-                if (user != null)
+                if (user != null && user.IsActive == true)
                 {
                     await _signInManager.SignOutAsync();
                     Microsoft.AspNetCore.Identity.SignInResult result =
@@ -232,7 +247,7 @@ namespace ExpenseTracker.Web.Controllers
         {
             return View();
         }
-        
+
 
         [HttpPost]
         [AllowAnonymous]
@@ -241,31 +256,50 @@ namespace ExpenseTracker.Web.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(email);
-                if (user == null || !await _userManager.IsEmailConfirmedAsync(user))
+                
+                //non-registered user, send no account registered email
+                if (user == null)
                 {
                     // Don't reveal that the user does not exist or is not confirmed
                     return View("ForgotPasswordConfirmation");
                 }
 
-                // For more information on how to enable account confirmation and password reset please 
-                // visit https://go.microsoft.com/fwlink/?LinkID=532713
-                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var resetPasswordLink = Url.Action(
-                     "ResetPassword", "Account",
-                    values: new { email, token = resetToken },
-                    protocol: Request.Scheme);
+                //active users
+                else if (user.IsActive == true)
+                {
 
-                await _emailService.ResetPassword(email, resetPasswordLink);
-                   
+                    // For more information on how to enable account confirmation and password reset please 
+                    // visit https://go.microsoft.com/fwlink/?LinkID=532713
+                    var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    var resetPasswordLink = Url.Action(
+                         "ResetPassword", "Account",
+                        values: new { email, token = resetToken },
+                        protocol: Request.Scheme);
 
+                    await SendResetPasswordEmail(email,resetPasswordLink);
+
+                    return View("ForgotPasswordConfirmation");
+                }
+
+                //non-active users, send no account registered email
                 return View("ForgotPasswordConfirmation");
             }
-
+            //ModelState.AddModelError(nameof(email), "Email not found!");
             return View();
         }
 
+        private async Task<bool> SendResetPasswordEmail(string email, string resetPasswordLink)
+        {
+            var appUser = await _userManager.FindByEmailAsync(email);
+            string message = await _viewRenderService.RenderToStringAsync("ResetPasswordTemplate", email);
+            message = message.Replace("{username}", appUser.UserName);
+            message = message.Replace("{email}", appUser.Email);
+            message = message.Replace("{resetPasswordLink}", resetPasswordLink);
+            return await _emailService.ResetPassword(appUser.Email, message);
+        }
+
         [AllowAnonymous]
-        public IActionResult ResetPassword(string email,string token = null)
+        public IActionResult ResetPassword(string email, string token = null)
         {
             if (token == null)
             {
@@ -281,7 +315,7 @@ namespace ExpenseTracker.Web.Controllers
                 return View(resetPassword);
             }
         }
-        
+
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel resetPassword)

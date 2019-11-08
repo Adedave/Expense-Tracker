@@ -15,5 +15,7 @@ namespace ExpenseTracker.Biz.IServices
         void AddExpense(Expense expense);
         void UpdateExpense(Expense expense);
         void DeleteExpense(Expense expense);
+        Task SendMonthlyReport();
+        Task TestEmail();
     }
 }

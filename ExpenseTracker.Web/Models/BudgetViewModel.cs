@@ -13,6 +13,9 @@ namespace ExpenseTracker.Web.Models
         [Required]
         public decimal BudgetAmount { get; set; }
 
+        public decimal TotalExpenses { get; set; }
+
+
         [Required]
         public string Month { get; set; }
 
@@ -20,7 +23,7 @@ namespace ExpenseTracker.Web.Models
         public string Year { get; set; }
 
         [Required]
-        public int IncomeCategoryId { get; set; }
+        public string BudgetCategory { get; set; }
 
     }
 }

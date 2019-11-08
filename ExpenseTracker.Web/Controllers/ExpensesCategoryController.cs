@@ -52,7 +52,7 @@ namespace ExpenseTracker.Web.Controllers
             var category = _expenseCategoryService.GetExpenseCategoryWithCurrentMonthExpenses(user.Id,id,month,year);
             if (category == null)
             {
-                return BadRequest("Category not found");
+                return NotFound("Category not found");
             }
 
             var budget = await GetCategoryBudget(id,month,year);
@@ -108,6 +108,7 @@ namespace ExpenseTracker.Web.Controllers
             }
 
             //what happens when the user is null
+            //this is an authorized controller, user cannot be null
             var user = await GetCurrentUser();
 
             _expenseCategoryService.AddCategory(name,user.Id);
@@ -133,7 +134,6 @@ namespace ExpenseTracker.Web.Controllers
                 return View();
             }
 
-            //what happens when the user is null
             var user = await GetCurrentUser();
 
             _expenseCategoryService.AddCategory(name,user.Id);
@@ -148,7 +148,7 @@ namespace ExpenseTracker.Web.Controllers
             var category = _expenseCategoryService.GetCategoryById(id);
             if (category == null)
             {
-                return BadRequest();
+                return NotFound();
             }
             return View(category);
         }
@@ -175,7 +175,7 @@ namespace ExpenseTracker.Web.Controllers
             var category = _expenseCategoryService.GetCategoryById(id);
             if (category == null)
             {
-                return BadRequest();
+                return NotFound();
             }
             _expenseCategoryService.DeleteCategory(category);
             return RedirectToAction("Index");
@@ -196,6 +196,7 @@ namespace ExpenseTracker.Web.Controllers
 
             return categoryDetails;
         }
+
         private async Task<AppUser> GetCurrentUser()
         {
             var user = await _userManager.FindByNameAsync(HttpContext.User.Identity.Name);
@@ -205,8 +206,11 @@ namespace ExpenseTracker.Web.Controllers
         private List<CategoryDetailsViewModel> CreateCategoryDetailsViewModels(string month, string year, string userId)
         {
             var categoryList = _expenseCategoryService.GetExpenseCategoriesWithCurrentMonthExpenses(userId,month,year);
+
             var budgetList = _budgetService.GetCurrentMonthBudgets(userId,month,year);
+
             List<CategoryDetailsViewModel> categoryDetails = new List<CategoryDetailsViewModel>();
+
             foreach (var item in categoryList)
             {
                 //you can do this search at the database level instead of fetching all the data from the database

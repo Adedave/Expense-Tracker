@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ExpenseTracker.Biz.IServices
 {
@@ -9,7 +10,8 @@ namespace ExpenseTracker.Biz.IServices
     {
         List<AdminExpenseCategory> GetCategories();
         List<AdminExpenseCategory> GetCategoriesByUserId(string userId);
-        void AddCategory(string name, string userId);
+        //void AddCategory(string name, string userId);
+        Task AddCategory(string name, string userId);
         AdminExpenseCategory GetCategoryById(int id);
         void UpdateCategory(AdminExpenseCategory name, string userId);
         void DeleteCategory(AdminExpenseCategory category);

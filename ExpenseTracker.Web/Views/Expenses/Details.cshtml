@@ -1,0 +1,35 @@
+﻿@model ExpenseTracker.Data.Domain.Models.Expense
+@inject IExpenseCategoryService Categories
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+<h4>Your expense <strong>@Model.NameOfExpense</strong> has been recorded successfully</h4>
+<h3><span class="text-danger">@{var exc = ViewBag.BudgetMessage ?? "";} @exc</span></h3>
+@if (!(ViewBag.IsBudgetSet ?? true))
+{
+    <p class="text-danger">
+        <strong>
+            Your have not created a Budget for @Model.DateOfExpense.ToString("MMMM") for this Category<br />
+            Consider creating a Budget <a asp-action="CreateBudget" asp-controller="Budget" target="_blank"
+                                         asp-route-month="@Model.DateOfExpense.ToString("MMMM")" asp-route-year="@Model.DateOfExpense.Year"
+                                         asp-route-categoryId="@Model.ExpenseCategoryId">here</a>
+        </strong>
+    </p>
+}
+<div>
+    <hr />
+    <div>
+        <span><strong>Expense Name:</strong> @Model.NameOfExpense</span><br />
+        <span><strong>Expense Cost:</strong>@{var toal = Model.CostOfExpense.ToString("0,0.00"); }
+                    @("\u20A6") @toal</span><br />
+        <span><strong>Expense Category:</strong>  @Categories.GetCategoryById(Model.ExpenseCategoryId).Name</span><br />
+        <span><strong>Expense Description:</strong>  @Model.MoreDescription</span><br />
+        <span><strong>Expense Date:</strong>  @Model.DateOfExpense.ToString("dd-MM-yyyy")</span><br />
+    </div>
+</div>
+<div>
+    <br/>
+    <a class="btn btn-yellow" asp-action="Index">Back to List</a>
+</div>

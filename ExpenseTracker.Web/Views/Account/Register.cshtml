@@ -1,5 +1,29 @@
 ﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register New Account";
+}
 <style>
+    /*.wrapper {
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    section {
+        background-color:#FFD500;
+    }
+    .inner {
+        /*background-color: #3B3A36;
+        position: relative;
+        width: 535px;
+        border: double #3B3A36 2px;
+        padding: 50px;
+    }
+    */
+    section {
+        /*background-color: #FFD500;*/
+    }
+
     .wrapper {
         min-height: 100vh;
         display: flex;
@@ -8,61 +32,96 @@
     }
 
     .inner {
+        background-color: #FFD500;
         position: relative;
         width: 535px;
-        border: double yellow 2px;
-        padding: 50px;
+        border: hidden #3B3A36 2px;
+        border-radius: 25px;
+        padding: 20px 10px;
+        /*margin-top:-50px;
+        margin-bottom:-50px;*/
     }
 </style>
-<h2 class="text-dark">@{var confirm = ViewBag.ConfirmEmail ?? " ";} @confirm</h2>
-<div style="max-width:100%;">
-    <div style="width:10%;margin:auto">
-        <h2>Register</h2>
-    </div>
-</div>
 
-<div asp-validation-summary=" All" class="text-danger"></div>
-<div class="wrapper">
+
+    @*<div style="max-width:100%;">
+    <div style="width:10%;margin:auto">
+    </div>
+</div>*@
+       
+    <div class="wrapper">
     <div class="inner">
+                @*<h2>Register</h2>*@
         <form asp-action="Register" method="post">
+            <h3 class="section-title-small text-center mb-50">Register</h3>
+
+            <div class="text-danger" asp-validation-summary="ModelOnly"></div>
             <div class="form-group">
                 <label asp-for="FirstName"></label>
                 <input asp-for="FirstName" class="form-control" placeholder="First name" />
+                <span class="text-danger" asp-validation-for="FirstName"></span>
+            </div>
+
+            <div class="form-group">
                 <label asp-for="LastName"></label>
                 <input asp-for="LastName" class="form-control" placeholder="Last name" />
+                <span class="text-danger" asp-validation-for="LastName"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="Email"></label>
                 <input asp-for="Email" class="form-control" placeholder="email@example.com" />
+                <span class="text-danger" asp-validation-for="Email"></span>
             </div>
 
             <div class="form-group">
                 <label>Phone Number</label>
                 <input asp-for="PhoneNumber" class="form-control" placeholder="Phone Number" />
+                <span class="text-danger" asp-validation-for="PhoneNumber"></span>
             </div>
+
+            @*<div class="form-group">
+                    <label for="exampleInputEmail1">Email address</label>
+                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                </div>*@
+
             <div class="form-group">
                 <label asp-for="Password"></label>
-                <input asp-for="Password" class="form-control" placeholder="Password(Must be at least 6 characters)" />
+                <input asp-for="Password" class="form-control" aria-describedby="passwordHelp" placeholder="Password" />
+                <span id="passwordHelp" class="form-text text-muted">Password must be at least 6 characters</span>
+                <br /><span class="text-danger" asp-validation-for="Password"></span>
             </div>
 
             <div class="form-group">
                 <label>Confirm Password</label>
                 <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password" />
+                <span class="text-danger" asp-validation-for="ConfirmPassword"></span>
             </div>
 
-            <div class="form-check checkbox form-check-inline">
-                <input class="form-check-input" name="TermsAndConditions" value="true" type="checkbox" id="isAgreed">
-                <label class="form-check-label" for="TermsAndConditions"> I agree to <a class="yellow-text" style="text-decoration:underline;">the Terms and Condition</a></label>
+            <div class="form-group form-check">
+                <input style="margin:5px;" type="checkbox" class="form-check-input" name="TermsAndConditions" value="true">
+                <label style="margin-left:30px;" class="form-check-label" for="TermsAndConditions">I agree to <a class="white-text" style="text-decoration:underline;">the Terms and Condition</a></label>
+                <br />
+                <span class="text-danger" asp-validation-for="TermsAndConditions"></span>
             </div>
+
+            @*<div class="form-group">
+                    <input style="margin:5px;" class="form-check-input" name="TermsAndConditions" value="true" type="checkbox" id="isAgreed">
+                    <label style="margin-left:30px;" for="TermsAndConditions"> I agree to <a class="yellow-text" style="text-decoration:underline;">the Terms and Condition</a></label>
+                </div>*@
             <br />
-            <a asp-action="Index" class="btn btn-secondary" style="background-color:indianred;">Cancel</a>
-            <button type="submit" class="btn btn-yellow">Register</button>
-            <div class="form-group">
+            <div style="float:right;">
+                @*<a asp-action="Index" class="btn btn-warning">Cancel</a>*@
+                <button type="submit" class="btn btn-warning">Register</button>
+            </div>
+            <div class="form-group" style="clear:both;">
+                <br/>
                 <p>
-                    <a asp-action="Login">Existing User?</a>
+                    <a asp-action="Login" style="color:white;">Existing User? Login here</a>
                 </p>
             </div>
         </form>
     </div>
 </div>
+

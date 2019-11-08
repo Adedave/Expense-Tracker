@@ -53,7 +53,8 @@ namespace ExpenseTracker.Data.Repositories
         public void Insert(AdminExpenseCategory obj)
         {
             _context.AdminExpenseCategories.Add(obj);
-            _context.SaveChanges();
+            
+         //   _context.SaveChanges();
         }
 
         public void Update(AdminExpenseCategory obj)

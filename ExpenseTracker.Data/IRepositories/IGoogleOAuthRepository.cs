@@ -7,6 +7,6 @@ namespace ExpenseTracker.Data.IRepositories
 {
     public interface IGoogleOAuthRepository : IRepository<GoogleAuth>
     {
-        GoogleAuth GetGoogleOAuthByEmail(string emailAddress);
+        GoogleAuth GetGoogleOAuthByEmailAndAccNumber(string emailAddress,string accNumber);
     }
 }

@@ -132,25 +132,29 @@ namespace ExpenseTracker.Web.Controllers
 
             if (viewModel.PreviousAlertEmail != viewModel.AlertEmail)
             {
-                return RedirectToAction("GoogleOAuth", "Email", account.BankAccountId);
+                return RedirectToAction("GoogleOAuth", "Email", account.AccountNumber);
             }
-            ViewBag.Updated = "Bank Account updated successfully";
-            return View(viewModel);
+            //ViewBag.Updated = "Bank Account updated successfully";
+            return RedirectToAction("Index");
         }
 
-        public IActionResult Delete(int id)
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
         {
+
             var bankAccount = _bankAccountService.GetById(id);
 
             if (bankAccount == null)
             {
-                return BadRequest();
+                var user = await GetCurrentUser();
+                ModelState.AddModelError("", "Bank account not found");
+                return View("Index", _bankAccountService.GetBankAccounts(user.Id));
             }
 
             _bankAccountService.DeleteBankAccount(bankAccount);
-
             return RedirectToAction("Index");
         }
+
         //private bool CheckAccount(string accountNumber, string userId)
         //{
         //    List<BankAccount> bankAccounts = new List<BankAccount>();

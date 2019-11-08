@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Domain\IRepositories\**" />
+    <EmbeddedResource Remove="Domain\IRepositories\**" />
+    <None Remove="Domain\IRepositories\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Migrations\20191028121443_bankAccIsConnected.cs" />
     <Compile Remove="Migrations\20191028122845_bankAccIsConnected.cs" />
   </ItemGroup>
@@ -14,10 +20,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.6" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Domain\IRepositories\" />
   </ItemGroup>
 
   <ItemGroup>

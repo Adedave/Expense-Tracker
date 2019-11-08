@@ -36,9 +36,9 @@ namespace ExpenseTracker.Biz.Services
             return _googleOAuthRepository.GetAll(userId).ToList();
         }
 
-        public GoogleAuth GetGoogleOAuthByEmail(string emailAddress)
+        public GoogleAuth GetGoogleOAuthByEmailAndAccNumber(string emailAddress,string accNumber)
         {
-            return _googleOAuthRepository.GetGoogleOAuthByEmail(emailAddress);
+            return _googleOAuthRepository.GetGoogleOAuthByEmailAndAccNumber(emailAddress,accNumber);
         }
 
         public void UpdateGoogleAuth(GoogleAuth googleAuth)

@@ -34,12 +34,21 @@ namespace ExpenseTracker.Data.Repositories
                         .ToList();
             return expenses;
         }
+        public List<Expense> FindExpensesByCategoryIdByMonth(string userId, int expenseCategoryId, DateTime month)
+        {
+            List<Expense> expenses = new List<Expense>();
+            expenses = _context.Expenses
+                        .Where(x => x.AppUserId == userId && x.ExpenseCategoryId == expenseCategoryId
+                        && x.DateOfExpense.ToString("MMMM") == month.ToString("MMMM") && x.DateOfExpense.Year == month.Year)
+                        .ToList();
+            return expenses;
+        }
 
         public IEnumerable<Expense> Get(Expression<Func<Expense, bool>> filter = null, Func<IQueryable<Expense>, IOrderedQueryable<Expense>> orderBy = null, string includeProperties = "")
         {
             throw new NotImplementedException();
         }
-
+        
         public IEnumerable<Expense> GetAll(string userId)
         {
             List<Expense> result = new List<Expense>();

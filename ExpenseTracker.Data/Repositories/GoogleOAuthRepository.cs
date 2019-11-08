@@ -44,10 +44,10 @@ namespace ExpenseTracker.Data.Repositories
             return googleAuth;
         }
 
-        public GoogleAuth GetGoogleOAuthByEmail(string emailAddress)
+        public GoogleAuth GetGoogleOAuthByEmailAndAccNumber(string emailAddress, string accNumber)
         {
             var oauth = _context.GoogleAuths
-                                .LastOrDefault(x => x.Email == emailAddress);
+                                .LastOrDefault(x => x.Email == emailAddress && x.AccountNumber == accNumber);
             return oauth;
         }
 

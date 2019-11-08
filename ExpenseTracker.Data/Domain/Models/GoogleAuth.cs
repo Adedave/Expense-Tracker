@@ -47,6 +47,9 @@ namespace ExpenseTracker.Data.Domain.Models
         public string AppUserId { get; set; }
         public string Email { get; set; }
 
+        //added account number because acc no is more unique to a bank account than email address
+        public string AccountNumber { get; set; }
+
         public long LargestUID { get; set; }
 
         public long UIDValidity { get; set; }

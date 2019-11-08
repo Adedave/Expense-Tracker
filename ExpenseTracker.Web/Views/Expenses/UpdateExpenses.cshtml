@@ -54,15 +54,20 @@
                 <span asp-validation-for="DateOfExpense" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="MoreDescription" class="control-label">More Description</label>
+                <textarea name="MoreDescription" placeholder="You can write anything else here about this expense" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="MoreDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <a asp-action="Index" class="btn btn-primary">Cancel</a>
 
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-yellow" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <h3><a asp-action="Index">Back to List</a></h3>
 </div>
 

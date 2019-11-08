@@ -22,6 +22,7 @@ namespace ExpenseTracker.Web.Controllers
             _reminderService = reminderService;
             _userManager = userManager;
         }
+
         // GET: /<controller>/
         public async Task<IActionResult> Index()
         {
@@ -48,7 +49,7 @@ namespace ExpenseTracker.Web.Controllers
             reminder.AppUserId = user.Id;
             _reminderService.Addreminder(reminder);
             ViewBag.Added = "Reminder created successfully";
-            return View(reminder);
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
@@ -58,7 +59,7 @@ namespace ExpenseTracker.Web.Controllers
             var reminder = _reminderService.GetById(id);
             if (reminder == null)
             {
-                return BadRequest();
+                return NotFound();
             }
             return View(reminder);
         }
@@ -69,7 +70,7 @@ namespace ExpenseTracker.Web.Controllers
             var user = await GetCurrentUser();
             reminder.AppUserId = user.Id;
             _reminderService.Updatereminder(reminder);
-            return View(reminder);
+            return RedirectToAction("Index");
         }
 
         [HttpPost]

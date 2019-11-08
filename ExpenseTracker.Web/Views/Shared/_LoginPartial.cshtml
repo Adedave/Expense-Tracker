@@ -2,7 +2,9 @@
 @inject SignInManager<AppUser> SignInManager
 @inject UserManager<AppUser> UserManager
 
-@if (SignInManager.IsSignedIn(User))
+@{var appUser = await UserManager.GetUserAsync(User); }
+
+@if (SignInManager.IsSignedIn(User) && await UserManager.IsInRoleAsync(appUser, "Users"))
 {
     <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "Expenses" ? "active" : "")"><a asp-controller="Expenses" asp-action="Index" class="nav-link">Expenses</a></li>
     <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "ExpensesCategory" ? "active" : "")"><a asp-controller="ExpensesCategory" asp-action="Index" class="nav-link">Categories</a></li>
@@ -11,6 +13,16 @@
     <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "BankAccount" ? "active" : "")"><a asp-controller="BankAccount" asp-action="Index" class="nav-link">Bank Accounts</a></li>
     <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "BankTransaction" ? "active" : "")"><a asp-controller="BankTransaction" asp-action="Index" class="nav-link">Bank Transactions</a></li>
     @*<li class="nav-item"><a class="nav-link text-primary" href="#">Hello @UserManager.GetUserName(User) ! </a></li>*@
+    <li class="nav-item">
+        <a class="nav-link text-danger" asp-controller="Account" asp-action="Logout">Logout</a>
+    </li>
+}
+else if (SignInManager.IsSignedIn(User) && await UserManager.IsInRoleAsync(appUser, "Admins"))
+{
+    <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "Admin" ? "active" : "")"><a asp-area="Admin" asp-controller="Admin" asp-action="Index" class="nav-link">User Accounts</a></li>
+    <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "RoleAdmin" ? "active" : "")"><a asp-area="Admin" asp-controller="RoleAdmin" asp-action="Index" class="nav-link">User Roles</a></li>
+    <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "AdminCategory" ? "active" : "")"><a asp-area="Admin" asp-controller="AdminCategory" asp-action="Index" class="nav-link">Admin Category</a></li>
+    <li class="nav-item"><a class="nav-link text-primary" href="#">Hello @UserManager.GetUserName(User) ! </a></li>
     <li class="nav-item">
         <a class="nav-link text-danger" asp-controller="Account" asp-action="Logout">Logout</a>
     </li>

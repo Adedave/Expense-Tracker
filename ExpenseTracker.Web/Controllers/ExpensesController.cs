@@ -26,67 +26,51 @@ namespace ExpenseTracker.Web.Controllers
     public class ExpensesController : Controller
     {
         private readonly IExpenseService _expenseService;
+        private readonly IBudgetService _budgetService;
         private readonly UserManager<AppUser> _userManager;
-        private readonly ExpenseTrackerDbContext _context;
         private readonly IEmailService _emailService;
         private readonly IExpenseCategoryService _expenseCategoryService;
 
-        public ExpensesController(IExpenseService expenseService, 
-            ExpenseTrackerDbContext context, IEmailService emailService,
+        public ExpensesController(IExpenseService expenseService, IViewRenderService viewRenderService,
+            IBudgetService budgetService, IEmailService emailService,
             IExpenseCategoryService expenseCategoryService,
             UserManager<AppUser> userManager)
         {
-            _context = context;
             _emailService = emailService;
             _expenseCategoryService = expenseCategoryService;
             _expenseService = expenseService;
+            _budgetService = budgetService;
             _userManager = userManager;
         }
-        public async Task<IActionResult> GetData(int pageIndex, int pageSize)
-        {
-            var user = await GetCurrentUser();
-            var query = _context.Expenses
-                        .Where(x => x.AppUserId == user.Id)
-                        .OrderByDescending(c => c.DateOfExpense)
-                        .Skip(pageIndex * pageSize)
-                        .Take(pageSize);
-            //var queryc = (from c in _context.Expenses
-            //             orderby c.DateOfExpense descending
-            //             select c)
-            //             .Skip(pageIndex * pageSize)
-            //             .Take(pageSize);
-            var expenses = query.ToList();
-            return Json(expenses);
-        }
-        public IActionResult Expenses()
-        {
-            return View();
-        }
 
-        public IActionResult Dashboard()
-        {
-            return View();
-        }
+        //public async Task<IActionResult> GetData(int pageIndex, int pageSize)
+        //{
+        //    var user = await GetCurrentUser();
+        //    var query = _context.Expenses
+        //                .Where(x => x.AppUserId == user.Id)
+        //                .OrderByDescending(c => c.DateOfExpense)
+        //                .Skip(pageIndex * pageSize)
+        //                .Take(pageSize);
+        //    //var queryc = (from c in _context.Expenses
+        //    //             orderby c.DateOfExpense descending
+        //    //             select c)
+        //    //             .Skip(pageIndex * pageSize)
+        //    //             .Take(pageSize);
+        //    var expenses = query.ToList();
+        //    return Json(expenses);
+        //}
+       
 
-        //Test
-        public async Task<IActionResult> SendEmail()
-        {
-            string subject = "HelloWorld";
-            string message = "HelloWorld";
-            string receipent = "onidavid97@gmail.com";
-            await _emailService.SendMessage(subject,message,receipent);
-            return Json("Email sent");
-        }
+        //[HttpGet]
+        //public async Task<LoadResult> Get(DataSourceLoadOptions loadOptions)
+        //{
+        //    var user = await GetCurrentUser();
+        //    var expenses = _context.Expenses
+        //                .Where(x => x.AppUserId == user.Id)
+        //                .OrderByDescending(c => c.DateOfExpense).ToList();
+        //    return DataSourceLoader.Load(expenses, loadOptions);
+        //}
 
-        [HttpGet]
-        public async Task<LoadResult> Get(DataSourceLoadOptions loadOptions)
-        {
-            var user = await GetCurrentUser();
-            var expenses = _context.Expenses
-                        .Where(x => x.AppUserId == user.Id)
-                        .OrderByDescending(c => c.DateOfExpense).ToList();
-            return DataSourceLoader.Load(expenses, loadOptions);
-        }
         public async Task<IActionResult> Index(string end, string timePeriod = "LastWeek", int categoryId = 0)
         {
             end = end ?? DateTime.Now.ToString();
@@ -109,7 +93,7 @@ namespace ExpenseTracker.Web.Controllers
 
             return View(expenses);
         }
-
+       
         private int SwitchDays(string timePeriod)
         {
             int days = 0;
@@ -141,6 +125,10 @@ namespace ExpenseTracker.Web.Controllers
             var expense = _expenseService.GetById(id);
             return expense;
         }
+        public IActionResult ExpensesInsights()
+        {
+            return View();
+        }
 
         [HttpGet]
         public async Task<IActionResult> AddExpenses()
@@ -157,39 +145,30 @@ namespace ExpenseTracker.Web.Controllers
             return View(expenses);
         }
 
-        public IActionResult ExpensesInsights()
-        {
-            return View("Viewer");
-        }
-        public IActionResult BarChart()
-        {
-            return View("StatisticsTest");
-        }
+        //public async Task<IActionResult> CategorizeExpenses(string timePeriod,int page=1)
+        //{
+        //    ViewData["CurrentSort"] = timePeriod;
+        //    // DateTime end;
+        //    //end = SetTimePeriod(timePeriod,out DateTime start);
+        //    //var query = _context.Expenses.Where(x => x.DateOfExpense <= end && x.DateOfExpense >= start);
+        //    //var pagedExpensesList = await PaginatedList<Expenses>.CreateAsync(query, page, 10);
+        //    var user = await GetCurrentUser();
 
-        public async Task<IActionResult> CategorizeExpenses(string timePeriod,int page=1)
-        {
-            ViewData["CurrentSort"] = timePeriod;
-            // DateTime end;
-            //end = SetTimePeriod(timePeriod,out DateTime start);
-            //var query = _context.Expenses.Where(x => x.DateOfExpense <= end && x.DateOfExpense >= start);
-            //var pagedExpensesList = await PaginatedList<Expenses>.CreateAsync(query, page, 10);
-            var user = await GetCurrentUser();
+        //    ViewBag.CategoryList = _expenseCategoryService.GetCategories(user.Id);
+        //    return View();
+        //}
 
-            ViewBag.CategoryList = _expenseCategoryService.GetCategories(user.Id);
-            return View();
-        }
+        //public async Task<IActionResult> PreviousExpenses(string timePeriod)
+        //{
+        //    DateTime end;
+        //    end = SetTimePeriod(timePeriod, out DateTime start);
+        //    //var query = _context.Expenses.Where(x => x.DateOfExpense <= end && x.DateOfExpense >= start);
+        //    //var pagedExpensesList = await PaginatedList<Expenses>.CreateAsync(query, 1, 10);
+        //    var user = await GetCurrentUser();
 
-        public async Task<IActionResult> PreviousExpenses(string timePeriod)
-        {
-            DateTime end;
-            end = SetTimePeriod(timePeriod, out DateTime start);
-            //var query = _context.Expenses.Where(x => x.DateOfExpense <= end && x.DateOfExpense >= start);
-            //var pagedExpensesList = await PaginatedList<Expenses>.CreateAsync(query, 1, 10);
-            var user = await GetCurrentUser();
-
-            ViewBag.CategoryList = _expenseCategoryService.GetCategories(user.Id);
-            return View();
-        }
+        //    ViewBag.CategoryList = _expenseCategoryService.GetCategories(user.Id);
+        //    return View();
+        //}
 
         private DateTime SetTimePeriod(string timePeriod, out DateTime start)
         {
@@ -216,22 +195,7 @@ namespace ExpenseTracker.Web.Controllers
             }
             return end;
         }
-
         
-        public IActionResult RecordTransaction(BankTransaction bankTransaction)
-        {
-            Expense expense = new Expense
-            {
-                CostOfExpense = bankTransaction.TransactionAmount,
-                DateOfExpense = bankTransaction.TransactionDate,
-                NameOfExpense = bankTransaction.Description,
-                MoreDescription = bankTransaction.Remarks,
-                AppUserId = bankTransaction.AppUserId
-            };
-            
-            return View("AddExpenses",expense);
-        }
-
         [HttpPost]
         public async Task<IActionResult> AddExpenses(Expense expenses)
          {
@@ -249,20 +213,14 @@ namespace ExpenseTracker.Web.Controllers
             
             //check if expenses have exceeded budget
             _expenseService.AddExpense(expenses);
-            
-            Dictionary<string, string> budgetMessage = CheckBudgetLimit(user,expenses);
-            if (!string.IsNullOrEmpty(budgetMessage["BudgetStatus"]) &&
-                !string.IsNullOrWhiteSpace(budgetMessage["BudgetStatus"]))
+            Dictionary<string, string> budgetMessage = CheckBudgetLimit(user, expenses);
+            if (budgetMessage["IsBudgetBelowExpense"] == "false" )
             {
                 //log if email was sent successfully for example if there is no internet or the mail sending failed for
                 //some other reason
                 await SendBudgetEmail(user.Email, budgetMessage["BudgetStatus"], budgetMessage["Category"]);
             }
-            ViewBag.IsBudgetSet = budgetMessage["IsBudgetSet"] == "true" ? true : false;
-            ViewBag.BudgetMessage = budgetMessage["BudgetStatus"]; 
-            ViewBag.Added = $"A new Expense {expenses.NameOfExpense} has been added successfully";
-
-            return View(expenses);
+            return RedirectToAction("Details", new { id = expenses.Id });
         }
 
         private Dictionary<string, string> CheckBudgetLimit(AppUser user, Expense expense)
@@ -271,12 +229,31 @@ namespace ExpenseTracker.Web.Controllers
                  _expenseService.CheckBugdetLimit(user.Id, expense.ExpenseCategoryId, expense.DateOfExpense);
         }
 
-        private async Task SendBudgetEmail(string email, string message, string category)
+        private async Task SendBudgetEmail(string email, string budgetStatus, string category)
         {
-            await _emailService.BudgetExceeded(email, message, category);
+            //if he is not active, he would not be logged in
+            var appUser =  await _userManager.FindByEmailAsync(email);
+
+            await _budgetService.SendBudgetExceededMail(appUser.UserName, email, budgetStatus, category);
         }
 
-        
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var user = await GetCurrentUser();
+            var expenses = await GetById(id);
+            Dictionary<string, string> budgetMessage = CheckBudgetLimit(user, expenses);
+            ViewBag.IsBudgetSet = budgetMessage["IsBudgetSet"] == "true" ? true : false;
+            ViewBag.BudgetMessage = budgetMessage["BudgetStatus"];
+            if (expenses == null)
+            {
+                ModelState.AddModelError("", "Selected expense not found!");
+                View(expenses);
+            }
+
+            return View(expenses);
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> UpdateExpenses(int id)
@@ -312,17 +289,14 @@ namespace ExpenseTracker.Web.Controllers
             expenses.AppUserId = user.Id;
             _expenseService.UpdateExpense(expenses);
             Dictionary<string, string> budgetMessage = CheckBudgetLimit(user, expenses);
-            if (!string.IsNullOrEmpty(budgetMessage["BudgetStatus"]) &&
-                !string.IsNullOrWhiteSpace(budgetMessage["BudgetStatus"]))
+            if (budgetMessage["IsBudgetBelowExpense"] == "false")
             {
                 //log if email was sent successfully for example if there is no internet or the mail sending failed for
                 //some other reason
                 await SendBudgetEmail(user.Email, budgetMessage["BudgetStatus"], budgetMessage["Category"]);
             }
-            ViewBag.IsBudgetSet = budgetMessage["IsBudgetSet"] == "true" ? true : false;
-            ViewBag.BudgetMessage = budgetMessage["BudgetStatus"];
-            ViewBag.Updated = $"Expenses {expenses.NameOfExpense} has been updated successfully";
-            return View(expenses);
+            
+            return RedirectToAction("Details",  new { id = expenses.Id} );
         }
 
         [HttpPost]
@@ -332,7 +306,7 @@ namespace ExpenseTracker.Web.Controllers
 
             if (expense == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             _expenseService.DeleteExpense(expense);

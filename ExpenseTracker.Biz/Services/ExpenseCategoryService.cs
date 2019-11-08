@@ -10,7 +10,7 @@ using System.Text;
 
 namespace ExpenseTracker.Biz.Services
 {
-    public class ExpenseCategoryService: IExpenseCategoryService
+    public class ExpenseCategoryService : IExpenseCategoryService
     {
         private readonly IExpenseCategoryRepository _expenseCategoryRepository;
         private readonly UserManager<AppUser> _userManager;
@@ -24,7 +24,7 @@ namespace ExpenseTracker.Biz.Services
             _adminCategoryRepository = adminCategoryRepository;
         }
 
-        public void AddCategory(string name,string userId)
+        public void AddCategory(string name, string userId)
         {
             ExpenseCategory category = new ExpenseCategory()
             {
@@ -34,7 +34,23 @@ namespace ExpenseTracker.Biz.Services
             };
             _expenseCategoryRepository.Insert(category);
         }
-        
+
+        public void AddCategoryWithoutSaveChanges(string name, string userId)
+        {
+            ExpenseCategory category = new ExpenseCategory()
+            {
+                Name = name,
+                DateCreated = DateTime.Now,
+                AppUserId = userId
+            };
+            _expenseCategoryRepository.InsertWithoutSaveChanges(category);
+        }
+
+        public void SaveChanges()
+        {
+            _expenseCategoryRepository.SaveChanges();
+        }
+
         private void CopyAdminCategories(string userId)
         {
             var adminCategories = _adminCategoryRepository.GetAdminCategories();
