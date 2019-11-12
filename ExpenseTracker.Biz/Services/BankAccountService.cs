@@ -3,6 +3,7 @@ using ExpenseTracker.Data.Domain.Models;
 using ExpenseTracker.Data.IRepositories;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -36,10 +37,21 @@ namespace ExpenseTracker.Biz.Services
         public bool UpdateBankAccountCheckIfExists(int bankAccountId, string accountNumber, string userId)
         {
             bool IsExists = false;
-            var existingBankAccount = _bankAccountRepository.GetByAccountNumberAndUserId(accountNumber,userId);
-            if (existingBankAccount.BankAccountId != bankAccountId)
+            try
             {
-                IsExists = true;
+                var existingBankAccount = _bankAccountRepository.GetByAccountNumberAndUserId(accountNumber,userId);
+                
+                //If bankAccountId of existingBankAccount is same as what was gotten from the database then we know 
+                //it is still the same bank account we are working with. But if not, we know the new account number 
+                //has been registered before by this userId
+                if (existingBankAccount != null && existingBankAccount?.BankAccountId != bankAccountId)
+                {
+                    IsExists = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
             return IsExists;
         }
