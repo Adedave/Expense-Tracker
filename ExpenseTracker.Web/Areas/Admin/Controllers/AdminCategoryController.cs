@@ -52,7 +52,7 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
 
             await _adminCategoryService.AddCategory(name, user.Id);
 
-            ViewBag.Added = $"A new Category {name} has been added successfully";
+            TempData["Message"] = $"Category \"{name}\" created successfully!";
             return RedirectToAction("Index");
         }
 
@@ -80,7 +80,8 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
             //category.AppUserId = user.Id;
             _adminCategoryService.UpdateCategory(category, user.Id);
 
-            ViewBag.Updated = $"Category {category.Name} has been updated successfully";
+            TempData["Message"] = $"Category \"{category.Name}\" was updated successfully!";
+
             return RedirectToAction("Index");
         }
 
@@ -92,6 +93,9 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
                 return NotFound();
             }
             _adminCategoryService.DeleteCategory(category);
+
+            TempData["Message"] = $"Category \"{category.Name}\" was deleted successfully!";
+
             return RedirectToAction("Index");
         }
 

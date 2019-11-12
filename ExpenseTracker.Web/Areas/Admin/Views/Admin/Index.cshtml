@@ -4,6 +4,15 @@
     ViewData["Title"] = "Index";
 }
 
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-dismissible show" role="alert">
+        @TempData["Message"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
 <div class="yellow-bg m-1 text-white" style="padding:10px;"><h4>User Accounts</h4></div>
 <a class="btn btn-dark" asp-action="Deactivated" style="float:right;">Deactivated users</a>
 <br />
@@ -33,14 +42,14 @@
                 </td>
                 <td>
                     @*<form asp-action="Delete" asp-route-id="@user.Id" method="post">
-            <a class="btn btn-sm btn-primary" asp-action="Edit"
-               asp-route-id="@user.Id">Edit</a>
-            <button type="submit"
-                    class="btn btn-sm btn-danger">
-                Deactivate
-            </button>
+                            <a class="btn btn-sm btn-primary" asp-action="Edit"
+                               asp-route-id="@user.Id">Edit</a>
+                            <button type="submit"
+                                    class="btn btn-sm btn-danger">
+                                Deactivate
+                            </button>
 
-        </form>*@
+                        </form>*@
                     <a class="btn btn-sm btn-yellow" asp-action="Edit" asp-route-id="@user.Id">Edit</a> |
                     <a id="deleteItem-@user.Id" data-target="#myModal-@user.Id" class="btn btn-sm btn-danger trigger-btn" data-toggle="modal" data-whatever="@user.Id">Deactivate</a>
                     <!-- Modal HTML -->

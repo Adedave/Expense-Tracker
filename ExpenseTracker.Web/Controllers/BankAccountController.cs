@@ -84,17 +84,23 @@ namespace ExpenseTracker.Web.Controllers
         {
             var user = await GetCurrentUser();
             var bankAccount = _bankAccountService.GetById(id);
-            BankAccountViewModel viewModel = new BankAccountViewModel
+            if (bankAccount != null)
             {
-                AppUserId = user.Id,
-                BankAccountId = bankAccount.BankAccountId,
-                AccountNumber = bankAccount.AccountNumber,
-                AlertEmail = bankAccount.AlertEmail,
-                PreviousAlertEmail = bankAccount.AlertEmail,
-                BankName = bankAccount.BankName,
-                IsConnnected = bankAccount.IsConnnected
-            };
-            return View(viewModel);
+                BankAccountViewModel viewModel = new BankAccountViewModel
+                {
+                    AppUserId = user.Id,
+                    BankAccountId = bankAccount.BankAccountId,
+                    AccountNumber = bankAccount.AccountNumber,
+                    PreviousAccountNumber = bankAccount.AccountNumber,
+                    AlertEmail = bankAccount.AlertEmail,
+                    PreviousAlertEmail = bankAccount.AlertEmail,
+                    BankName = bankAccount.BankName,
+                    IsConnnected = bankAccount.IsConnnected
+                };
+                return View(viewModel);
+            }
+
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
@@ -118,24 +124,25 @@ namespace ExpenseTracker.Web.Controllers
                 ModelState.AddModelError("", "This Account number has already been registered");
                 return View(viewModel);
             }
-            
-            BankAccount account = new BankAccount()
+            var bankAccount = _bankAccountService.GetById(viewModel.BankAccountId);
+            if (bankAccount != null)
             {
-                BankAccountId = viewModel.BankAccountId,
-                AccountNumber = viewModel.AccountNumber,
-                AlertEmail = viewModel.AlertEmail,
-                AppUserId = viewModel.AppUserId,
-                BankName = viewModel.BankName,
-                IsConnnected = viewModel.PreviousAlertEmail == viewModel.AlertEmail ? viewModel.IsConnnected : false
-            };
+                //bankAccount.BankAccountId = viewModel.BankAccountId;
+                bankAccount.AccountNumber = viewModel.AccountNumber;
+                bankAccount.AlertEmail = viewModel.AlertEmail;
+                bankAccount.AppUserId = viewModel.AppUserId;
+                bankAccount.BankName = viewModel.BankName;
+                bankAccount.IsConnnected = (viewModel.PreviousAccountNumber == viewModel.AccountNumber
+                                     && viewModel.PreviousAlertEmail == viewModel.AlertEmail) ? viewModel.IsConnnected : false;
 
-            _bankAccountService.UpdateBankAccount(account);
+                _bankAccountService.UpdateBankAccount(bankAccount);
 
-            if (viewModel.PreviousAlertEmail != viewModel.AlertEmail)
-            {
-                return RedirectToAction("GoogleOAuth", "Email", account.AccountNumber);
+                if (viewModel.PreviousAlertEmail != viewModel.AlertEmail)
+                {
+                    return RedirectToAction("GoogleOAuth", "Email", bankAccount.AccountNumber);
+                }
+                TempData["Message"] = $"Bank Account \"{viewModel.AccountNumber}\" updated successfully!";
             }
-            TempData["Message"] = $"Bank Account \"{viewModel.AccountNumber}\" updated successfully!";
             return RedirectToAction("Index");
         }
 

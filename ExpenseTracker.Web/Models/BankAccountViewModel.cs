@@ -14,6 +14,7 @@ namespace ExpenseTracker.Web.Models
         [StringLength(10, MinimumLength = 10, ErrorMessage = "Account Number must be a 10 digit NUBAN account number.")]
         //[RegularExpression("[0,1,2,3,4,5,6,7,8,9]", ErrorMessage = "Account Number must be a 10 digit NUBAN account number.")]
         public string AccountNumber { get; set; }
+        public string PreviousAccountNumber { get; set; }
 
         [Required(ErrorMessage = "Bank Name field is required")]
         public string BankName { get; set; }

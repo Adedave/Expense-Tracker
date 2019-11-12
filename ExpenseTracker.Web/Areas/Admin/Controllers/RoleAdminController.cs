@@ -42,6 +42,8 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
                 IdentityResult result = await _roleManager.CreateAsync(new IdentityRole(name));
                 if (result.Succeeded)
                 {
+
+                    TempData["Message"] = $"Role \"{name}\" was created successfully!";
                     return RedirectToAction("Index");
                 }
                 else
@@ -103,9 +105,9 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
                         }
                     }
                 }
-            }
-            if (ModelState.IsValid)
-            {
+           
+                TempData["Message"] = $"Role \"{model.RoleName}\" was updated successfully!";
+
                 return RedirectToAction(nameof(Index));
             }
             else
@@ -123,6 +125,8 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
                 IdentityResult result = await _roleManager.DeleteAsync(role);
                 if (result.Succeeded)
                 {
+                    TempData["Message"] = $"Role \"{role.Name}\" was deleted successfully!";
+
                     return RedirectToAction("Index");
                 }
                 else

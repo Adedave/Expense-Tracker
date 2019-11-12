@@ -90,6 +90,8 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
                 IdentityResult result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    TempData["Message"] = $"User \"{model.Name}\" was created successfully!";
+
                     return RedirectToAction("Index");
                 }
                 else
@@ -149,6 +151,8 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
                     IdentityResult result = await _userManager.UpdateAsync(user);
                     if (result.Succeeded)
                     {
+                        TempData["Message"] = $"User \"{user?.UserName}\" was updated successfully!";
+
                         return RedirectToAction("Index");
                     }
                     else
@@ -175,6 +179,7 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
                 IdentityResult result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
+                    TempData["Message"] = $"User \"{user.UserName}\" was deleted successfully!";
                     return RedirectToAction("Index");
                 }
                 else

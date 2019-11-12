@@ -1,6 +1,16 @@
 ﻿@model IEnumerable<IdentityRole>
 <div class="bg-primary m-1 p-1" style="padding:10px;"><h4>Roles</h4></div>
 <br />
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-dismissible show" role="alert">
+        @TempData["Message"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <br/>
+}
 <div class="text-danger" asp-validation-summary="ModelOnly"></div>
 <table class="table table-sm table-bordered table-bordered">
     <tr><th>ID</th><th>Name</th><th>Users</th><th></th></tr>
