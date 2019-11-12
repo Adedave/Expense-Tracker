@@ -74,7 +74,7 @@ namespace ExpenseTracker.Data.Repositories
         {
             var expenseCategory = _context.ExpenseCategories
                             .Include(x => x.Expenses)
-                            .FirstOrDefault(x => x.Id == id);
+                            .SingleOrDefault(x => x.Id == id);
             return expenseCategory;
 
         }

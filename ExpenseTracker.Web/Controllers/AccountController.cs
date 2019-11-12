@@ -320,28 +320,32 @@ namespace ExpenseTracker.Web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel resetPassword)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return View();
-            }
+                var user = await _userManager.FindByEmailAsync(resetPassword.Email);
+                if (user == null)
+                {
+                    // Don't reveal that the user does not exist
+                    return RedirectToAction("ResetPasswordConfirmation");
+                }
 
-            var user = await _userManager.FindByEmailAsync(resetPassword.Email);
-            if (user == null)
-            {
-                // Don't reveal that the user does not exist
-                return View("ResetPasswordConfirmation");
-            }
+                var result = await _userManager.ResetPasswordAsync(user, resetPassword.ResetPasswordToken, resetPassword.Password);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("ResetPasswordConfirmation");
+                }
 
-            var result = await _userManager.ResetPasswordAsync(user, resetPassword.ResetPasswordToken, resetPassword.Password);
-            if (result.Succeeded)
-            {
-                return View("ResetPasswordConfirmation");
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
             }
+            return View();
+        }
 
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
+        [AllowAnonymous]
+        public IActionResult ResetPasswordConfirmation()
+        {
             return View();
         }
 

@@ -64,6 +64,7 @@ namespace ExpenseTracker.Web.Controllers
                 //to check for direct access to this action without {code} or redirection from google's oauth page
                 if (code == null)
                 {
+                    TempData["Message"] = "Bank account added successfully!";
                     return RedirectToAction("Index", "BankAccount");
                 }
                 var appUser = await GetCurrentUser();
@@ -83,8 +84,8 @@ namespace ExpenseTracker.Web.Controllers
             {
                 Debug.WriteLine(ex.Message);
             }
+            TempData["Message"] = "Bank account added successfully!";
             return RedirectToAction("Index", "BankAccount");
-            
         }
 
         private GoogleAuth AddOAuthProp(string id, string alertEmail, string accNumber, GoogleAuth googleAuth)

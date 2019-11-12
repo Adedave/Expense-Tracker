@@ -107,7 +107,7 @@ namespace ExpenseTracker.Web.Controllers
             }
 
             _budgetService.AddBudget(budget);
-
+            TempData["Message"] = $"Budget for \"{budget?.Category?.Name} category\" was created successfully!";
             return RedirectToAction("Index",new { month = budget?.Month, year = budget?.Year});
         }
 
@@ -123,7 +123,7 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult UpdateBudget(Budget  budget)
+        public IActionResult UpdateBudget(Budget budget)
         {
             if (budget == null || !ModelState.IsValid)
             {
@@ -135,6 +135,8 @@ namespace ExpenseTracker.Web.Controllers
                 return View(budget);
             }
             _budgetService.UpdateBudget(budget);
+            
+            TempData["Message"] = $"Budget for \"{budget?.Category?.Name} category\" was updated successfully!";
             return RedirectToAction("Index", new { month = budget.Month, year = budget.Year });
         }
 
@@ -148,6 +150,8 @@ namespace ExpenseTracker.Web.Controllers
             }
 
             _budgetService.DeleteBudget(budget);
+
+            TempData["Message"] = $"Budget for \"{budget?.Category?.Name} category\" was deleted successfully!";
             return RedirectToAction("Index",new { month = budget.Month, year = budget.Year });
         }
         

@@ -5,20 +5,6 @@
 }
 
 <h1>Record Transaction</h1>
-
-<span>@{var str = ViewBag.Added ?? "";} @str</span>
-<h3><span class="text-danger">@{var exc = ViewBag.BudgetMessage ?? "";} @exc</span></h3>
-@if (!(ViewBag.IsBudgetSet ?? true))
-{
-    <p class="text-danger">
-        <strong>
-            Your have not created a Budget for @Model.DateOfExpense.ToString("MMMM") for this Category<br />
-            Consider setting a Budget <a asp-action="CreateBudget" asp-controller="Budget"
-                                         asp-route-month="@Model.DateOfExpense.ToString("MMMM")" asp-route-year="@Model.DateOfExpense.Year"
-                                         asp-route-categoryId="@Model.ExpenseCategoryId">here</a>
-        </strong>
-    </p>
-}
 <hr />
 <div class="row">
     <div class="col-md-4">

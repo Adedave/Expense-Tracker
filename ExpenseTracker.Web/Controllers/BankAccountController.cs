@@ -125,7 +125,8 @@ namespace ExpenseTracker.Web.Controllers
                 AccountNumber = viewModel.AccountNumber,
                 AlertEmail = viewModel.AlertEmail,
                 AppUserId = viewModel.AppUserId,
-                BankName = viewModel.BankName
+                BankName = viewModel.BankName,
+                IsConnnected = viewModel.PreviousAlertEmail == viewModel.AlertEmail ? viewModel.IsConnnected : false
             };
 
             _bankAccountService.UpdateBankAccount(account);
@@ -134,7 +135,7 @@ namespace ExpenseTracker.Web.Controllers
             {
                 return RedirectToAction("GoogleOAuth", "Email", account.AccountNumber);
             }
-            //ViewBag.Updated = "Bank Account updated successfully";
+            TempData["Message"] = $"Bank Account \"{viewModel.AccountNumber}\" updated successfully!";
             return RedirectToAction("Index");
         }
 

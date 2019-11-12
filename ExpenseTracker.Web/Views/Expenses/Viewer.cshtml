@@ -1,9 +1,9 @@
 ﻿
 @{
-    ViewData["Title"] = "ExpensesInsights";
+    ViewData["Title"] = "Expenses Insights";
 }
 
-<h1>ExpensesInsights</h1>
+<h1>Expenses Insights</h1>
 <h1><a asp-action="BarChart">View on Bar chart</a></h1>
 
 <style>
@@ -82,28 +82,18 @@
                         .CustomizeTooltip(@<text>
                             function (args) {
                             return {
-                            html: "<div class='state-tooltip'>
-                                " +
-                                "<h4>
-                                    " + args.argument  +
-                                    "
-                                </h4> <div>
-                                    " +
+                            html: "<div class='state-tooltip'>" +
+                                "<h4>" + args.argument  +
+                                    "</h4> <div>" +
                                     "<span class='caption'>Total Cost of Expenses</span>: " +
                                     new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(this.value) +
                                     "<br /><span class='caption'>For: @DateTime.Now.ToString("MMMM")  @DateTime.Now.Year </span> " +
-                                    "
-                                </div>" +
-                                "
-                            </div>"
-                            };
-                            }
-                        </text>)
-                                            ).DataSource(d => d
-                                                             .StaticJson()
-                                                             .Url(Url.Action("GetCategoryDetailsModel", "ExpensesCategory",
-                                                             new { month = DateTime.Now.ToString("MMMM"), year = DateTime.Now.Year }))
-                                                            ))
+                                    "</div>" + "</div>"};}
+                        </text>))
+    .DataSource(d => d
+    .StaticJson()
+    .Url(Url.Action("GetCategoryDetailsModel", "ExpensesCategory",
+    new { month = DateTime.Now.ToString("MMMM"), year = DateTime.Now.Year }))))
 
 
 <div class="action">
@@ -129,25 +119,15 @@
                                         enabled: true,
                                         customizeTooltip: function (data,des=ss) {
                                         return {
-                                        html: "<div class='state-tooltip'>
-                                            " +
-                                            "<h4>
-                                                " + data.argument  +
-                                                "
-                                            </h4><div>
-                                                " +
+                                        html: "<div class='state-tooltip'>" +
+                                            "<h4>" + data.argument  +
+                                                "</h4><div>" +
                                                 "<span class='caption'>Total Cost of Expenses</span>: " +
                                                 new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(this.value) +
-                                                "<br /><span class='caption'>
-                                                    For: " + des + " " +  @DateTime.Now.Year +
-                                                    "
-                                                </span>
-                                            </div>" +
-                                            "
-                                        </div>"
-                                        };}}})}
-                                </text>)
-    )
+                                                "<br /><span class='caption'>For: " + des + " " +  @DateTime.Now.Year +
+                                                "</span></div>" +
+                                            "</div>"};}}})}
+                                </text>))
     <div id="Month" class="templabel">
         Choose a Month:
     </div>

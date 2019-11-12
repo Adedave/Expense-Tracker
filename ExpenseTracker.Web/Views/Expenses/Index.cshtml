@@ -1,10 +1,5 @@
 ﻿@model List<Expense>
 @inject IExpenseCategoryService Categories
-<style>
-    #dropDownC {
-
-    }
-</style>
 @{
     ViewData["Title"] = "Expenses";
 }
@@ -17,16 +12,24 @@
     string currentEndString = currentEnd.ToString();
     string dateTimeNowString = DateTime.Now.ToString();
 }
-
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-dismissible show" role="alert">
+        @TempData["Message"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
 
 <a class="btn btn-yellow" asp-action="AddExpenses">Add New Expense</a> |
 <a class="btn btn-yellow" asp-action="ExpensesInsights">Get Insights from your Expenses</a> |
-<a class="btn btn-yellow" asp-action="Create" asp-controller="Reminder">Set a reminder to input your Expenses</a><br/><br />
-<form asp-action="Index" method="get" >
+<a class="btn btn-yellow" asp-action="Create" asp-controller="Reminder">Set a reminder to input your Expenses</a><br /><br />
+<form asp-action="Index" method="get">
     <div class="form-actions no-color">
         <p>
             <div class="form-inline" style="display:inline-table;">
-                <label>Find by category:&nbsp;&nbsp; </label>@Html.DropDownList("categoryId", new SelectList(ViewBag.CategoryList, "Id", "Name"), "select  category", new { id = @ViewData["CurrentFilter"], @class = "validate-select form-control"})
+                <label>Find by category:&nbsp;&nbsp; </label>@Html.DropDownList("categoryId", new SelectList(ViewBag.CategoryList, "Id", "Name"), "select  category", new { id = @ViewData["CurrentFilter"], @class = "validate-select form-control" })
                 <input type="hidden" name="end" value="@currentEndString" />
                 <input type="hidden" name="timePeriod" value="@ViewBag.CurrentTimePeriod" />
             </div>
@@ -104,8 +107,8 @@ else
                 </td>
                 <td>
                     <a asp-action="UpdateExpenses" asp-route-id="@item.Id"><i class="fa fa-edit"></i></a>|
-            
-                     <a id="deleteItem-@item.Id" data-target="#myModal-@item.Id" class="trigger-btn" data-toggle="modal" data-whatever="@item.Id"><i class="fa fa-trash"></i></a>
+
+                    <a id="deleteItem-@item.Id" data-target="#myModal-@item.Id" class="trigger-btn" data-toggle="modal" data-whatever="@item.Id"><i class="fa fa-trash"></i></a>
 
                     <!-- Modal HTML -->
                     <div id="myModal-@item.Id" class="modal fade">
@@ -166,7 +169,7 @@ else
 </a>
 
 <script type="text/javascript">
-    
+
         function GetIndex() {
             var timePeriod = $("#timePeriods").val();
             var endDate = new Intl.DateTimeFormat('en-GB').format(new Date((@currentEnd.ToString("yyyy/MM/dd"))));

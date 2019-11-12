@@ -5,7 +5,15 @@
 }
 
 <h2>Details</h2>
-<h4>Your expense <strong>@Model.NameOfExpense</strong> has been recorded successfully</h4>
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-dismissible show" role="alert">
+        @TempData["Message"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
 <h3><span class="text-danger">@{var exc = ViewBag.BudgetMessage ?? "";} @exc</span></h3>
 @if (!(ViewBag.IsBudgetSet ?? true))
 {

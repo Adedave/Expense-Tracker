@@ -85,11 +85,8 @@
                             new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(this.value) +
                             "<br/><span class='caption'>For: @DateTime.Now.ToString("MMMM")  @DateTime.Now.Year </span> " +
                             "</div>" +
-                        "</div>"
-                    };
-                    }
-                </text>)
-)
+                        "</div>" }; }
+                </text>))
                 .DataSource(d => d
                     .StaticJson()
                     .Url(Url.Action("GetCategoryDetails", "Category",

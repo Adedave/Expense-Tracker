@@ -4,6 +4,15 @@
 }
 
 <h2>Bank Transactions</h2>
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-dismissible show" role="alert">
+        @TempData["Message"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
 <p>
     <a class="btn btn-yellow" asp-action="RegisterAccount" asp-controller="BankAccount">Register A New Bank Account</a> |
     <a class="btn btn-yellow" asp-action="Index" asp-controller="BankAccount">View Registered Bank Accounts</a>
@@ -27,7 +36,7 @@
         <p>
             <div class="form-inline" style="display:inline-table;">
                 <label>Select Account:&nbsp;&nbsp;</label>@Html.DropDownList("accountId", new SelectList(ViewBag.AccountList, "Id", "Name"), "select  account", new { Id = "accountId", @class = "validate-select form-control" })
-            <br />
+                <br />
                 <input type="submit" value="Search" class="btn btn-yellow" /> |
                 <a asp-action="Index">Back to Full List</a>
             </div>
@@ -64,10 +73,10 @@
                 Recorded
             </th>
             <th>
-                
+
             </th>
             <th>
-                
+
             </th>
         </tr>
     </thead>
@@ -77,19 +86,20 @@
         @foreach (var item in Model)
         {
             i++;
-        <tr>
-            <td>@i</td>
-            <td>@item.Subject</td>
-            @*<td>@item.TransactionType</td>*@
-            <td>@item.Description</td>
-            <td>
-                @{var total = item.TransactionAmount.ToString("0,0.00"); }
-                @total
-            </td>
-            <td>@item.AccountNumber</td>
-            <td>@item.TransactionDate.ToShortDateString()</td>
-            <td>@item.Remarks</td>
-            <td>@{var recorded = item.IsRecorded == true ? "Yes" : "No";}
+            <tr>
+                <td>@i</td>
+                <td>@item.Subject</td>
+                @*<td>@item.TransactionType</td>*@
+                <td>@item.Description</td>
+                <td>
+                    @{var total = item.TransactionAmount.ToString("0,0.00"); }
+                    @total
+                </td>
+                <td>@item.AccountNumber</td>
+                <td>@item.TransactionDate.ToShortDateString()</td>
+                <td>@item.Remarks</td>
+                <td>
+                    @{var recorded = item.IsRecorded == true ? "Yes" : "No";}
                 @recorded
             </td>
             @{ if (item.TransactionType == "Debit")
@@ -160,7 +170,7 @@
             }
 
         </tr>
-        }
+    }
 
     </tbody>
 </table>

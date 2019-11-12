@@ -25,8 +25,9 @@ namespace ExpenseTracker.Web.Controllers
         private readonly IExpenseService _expenseService;
         private readonly IEmailService _emailService;
 
-        public BankTransactionController(ExpenseTrackerDbContext context, UserManager<AppUser> userManager
-            ,IExpenseCategoryService expenseCategoryService,IExpenseService expenseService, IEmailService emailService)
+        public BankTransactionController(ExpenseTrackerDbContext context, UserManager<AppUser> userManager,
+            IExpenseCategoryService expenseCategoryService,
+            IExpenseService expenseService, IEmailService emailService)
         {
             _context = context;
             _userManager = userManager;
@@ -197,6 +198,8 @@ namespace ExpenseTracker.Web.Controllers
                 await SendBudgetEmail(user.Email, budgetMessage["BudgetStatus"], budgetMessage["Category"]);
             }
 
+            TempData["Message"] = $"Transaction \"{bankExpense.NameOfExpense}\" recorded successfully!";
+
             return RedirectToAction("Details", new { id = bankExpense.Id });
         }
 
@@ -264,6 +267,8 @@ namespace ExpenseTracker.Web.Controllers
             _context.Entry(bankTransaction).State = EntityState.Modified;
             _context.SaveChanges();
             // should i delete the transaction or move it to recycle bin table ...sort of
+            TempData["Message"] = $"Transaction \"{bankTransaction.Subject}\" deleted successfully!";
+
             return RedirectToAction("Index");
             
         }

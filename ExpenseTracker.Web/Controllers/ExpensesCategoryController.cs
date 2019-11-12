@@ -26,8 +26,10 @@ namespace ExpenseTracker.Web.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IBudgetService _budgetService;
 
-        public ExpensesCategoryController(IExpenseCategoryService expenseCategoryService, ExpenseTrackerDbContext context,
-            UserManager<AppUser> userManager, IBudgetService budgetService)
+        public ExpensesCategoryController(IExpenseCategoryService expenseCategoryService,
+            ExpenseTrackerDbContext context,
+            UserManager<AppUser> userManager, 
+            IBudgetService budgetService)
         {
             _expenseCategoryService = expenseCategoryService;
             _context = context;
@@ -112,33 +114,8 @@ namespace ExpenseTracker.Web.Controllers
             var user = await GetCurrentUser();
 
             _expenseCategoryService.AddCategory(name,user.Id);
-           
-            ViewBag.Added = $"A new Category {name} has been added successfully";
-            return RedirectToAction("Index");
-        }
 
-        [HttpGet]
-        [Authorize(Roles = "Admins")]
-        public IActionResult AddAdminCategory()
-        {
-            return View("AddCategory");
-        }
-        
-
-        [HttpPost]
-        [Authorize(Roles = "Admins")]
-        public async Task<IActionResult> AddAdminCategory(string name)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View();
-            }
-
-            var user = await GetCurrentUser();
-
-            _expenseCategoryService.AddCategory(name,user.Id);
-           
-            ViewBag.Added = $"A new Category {name} has been added successfully";
+            TempData["Message"] = $"Category \"{name}\" created successfully!";
             return RedirectToAction("Index");
         }
         
@@ -166,7 +143,7 @@ namespace ExpenseTracker.Web.Controllers
             //category.AppUserId = user.Id;
             _expenseCategoryService.UpdateCategory(category, user.Id);
            
-            ViewBag.Updated = $"Category {category.Name} has been updated successfully";
+            TempData["Message"] = $"Category \"{category.Name}\" updated successfully!";
             return RedirectToAction("Index");
         }
 
@@ -178,6 +155,7 @@ namespace ExpenseTracker.Web.Controllers
                 return NotFound();
             }
             _expenseCategoryService.DeleteCategory(category);
+            TempData["Message"] = $"Category \"{category.Name}\" deleted successfully!";
             return RedirectToAction("Index");
         }
 

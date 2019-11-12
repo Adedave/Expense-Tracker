@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Hangfire;
 using ExpenseTracker.Biz.IServices;
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace ExpenseTracker.Web
 {
@@ -96,7 +97,7 @@ namespace ExpenseTracker.Web
         }
         
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             //app.UseDevExpressControls();
             if (env.IsDevelopment())
@@ -109,6 +110,8 @@ namespace ExpenseTracker.Web
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            //loggerFactory.AddFile("Logs/cyberspace{Date}.txt");
 
             app.UseHangfireDashboard();
             app.UseHangfireServer();

@@ -46,7 +46,7 @@ namespace ExpenseTracker.Biz.Services
             {
                 { "BudgetStatus", "" },
                 {"IsBudgetSet","false" },
-                { "IsBudgetBelowExpense","false"},
+                { "IsBudgetBelowExpense","true"},
                 { "Category",$"{category?.Name}"},
                 {"Month",$"{date.ToString("MMMM")}" },
                 {"Year",$"{date.Year.ToString()}" },
@@ -66,6 +66,7 @@ namespace ExpenseTracker.Biz.Services
                 string budgetedAmount = budget?.Amount.ToString("0,0.00");
                 if (totalExpenseCost > budget?.Amount)
                 {
+                    budgetDetails["IsBudgetBelowExpense"] = "false";
                     string amountExceeded = (totalExpenseCost - budget.Amount).ToString("0,0.00");
                     budgetDetails["BudgetStatus"] = $"Your expenses for {date.ToString("MMMM yyyy")} has exceeded your " +
                         $"budget of \u20A6{budgetedAmount} for {category?.Name} category" +
@@ -73,12 +74,14 @@ namespace ExpenseTracker.Biz.Services
                 }
                 else if (budget?.Amount == totalExpenseCost)
                 {
+                    budgetDetails["IsBudgetBelowExpense"] = "false";
                     budgetDetails["BudgetStatus"] = $"Your expenses for {date.ToString("MMMM yyyy")} has met your budget" +
                        $" of \u20A6{budgetedAmount} for {category?.Name} category";
                 }
                 else
                 {
-                    budgetDetails["IsBudgetBelowExpense"] = "true";
+                    //set to true already at initialization
+                    //budgetDetails["IsBudgetBelowExpense"] = "true";
                     string amountRemaining = (budget.Amount - totalExpenseCost).ToString("0,0.00");
                     budgetDetails["BudgetStatus"] = $"You have \u20A6{amountRemaining} remaining of your budgeted \u20A6{budgetedAmount} for {category?.Name} in {date.ToString("MMMM yyyy")}.";
                 }

@@ -220,6 +220,7 @@ namespace ExpenseTracker.Web.Controllers
                 //some other reason
                 await SendBudgetEmail(user.Email, budgetMessage["BudgetStatus"], budgetMessage["Category"]);
             }
+            TempData["Message"] = $"{expenses.NameOfExpense} expense added successfully!";
             return RedirectToAction("Details", new { id = expenses.Id });
         }
 
@@ -295,7 +296,7 @@ namespace ExpenseTracker.Web.Controllers
                 //some other reason
                 await SendBudgetEmail(user.Email, budgetMessage["BudgetStatus"], budgetMessage["Category"]);
             }
-            
+            TempData["Message"] = $"{expenses.NameOfExpense} expense updated successfully!";
             return RedirectToAction("Details",  new { id = expenses.Id} );
         }
 
@@ -310,7 +311,7 @@ namespace ExpenseTracker.Web.Controllers
             }
 
             _expenseService.DeleteExpense(expense);
-
+            TempData["Message"] = $"{expense.NameOfExpense} expense deleted successfully!";
             return RedirectToAction("Index");
         }
 

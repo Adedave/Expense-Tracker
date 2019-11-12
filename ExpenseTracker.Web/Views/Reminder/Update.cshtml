@@ -1,12 +1,11 @@
 ﻿@model Reminder
 
 @{
-    ViewData["Title"] = "Edit Reminder";
+    ViewData["Title"] = "Update Reminder";
 }
 
-<h2>Edit Reminder</h2>
+<h2>Update Reminder</h2>
 <hr />
-<span>@{var str = ViewBag.Edited ?? "";} @str</span><br />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Update">

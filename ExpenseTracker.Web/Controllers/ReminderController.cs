@@ -48,7 +48,8 @@ namespace ExpenseTracker.Web.Controllers
             var user = await GetCurrentUser();
             reminder.AppUserId = user.Id;
             _reminderService.Addreminder(reminder);
-            ViewBag.Added = "Reminder created successfully";
+
+            TempData["Message"] = "Reminder created successfully!";
             return RedirectToAction("Index");
         }
 
@@ -70,6 +71,8 @@ namespace ExpenseTracker.Web.Controllers
             var user = await GetCurrentUser();
             reminder.AppUserId = user.Id;
             _reminderService.Updatereminder(reminder);
+
+            TempData["Message"] = "Reminder updated successfully!";
             return RedirectToAction("Index");
         }
 
@@ -77,6 +80,8 @@ namespace ExpenseTracker.Web.Controllers
         public IActionResult Delete(int id)
         {
             _reminderService.Deletereminder(id);
+
+            TempData["Message"] = "Reminder deleted successfully!";
             return RedirectToAction("Index");
         }
 
