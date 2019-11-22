@@ -79,7 +79,7 @@ namespace ExpenseTracker.Data.Repositories
 
         }
 
-        public List<ExpenseCategory> GetExpenseCategories(string userId)
+        public IEnumerable<ExpenseCategory> GetExpenseCategories(string userId)
         {
             List<ExpenseCategory> result = new List<ExpenseCategory>();
             result = _context.ExpenseCategories
@@ -88,7 +88,7 @@ namespace ExpenseTracker.Data.Repositories
             return result;
         }
 
-        public List<ExpenseCategory> GetExpenseCategoriesWithCurrentMonthExpenses(string userId, string month, string year)
+        public IEnumerable<ExpenseCategory> GetExpenseCategoriesWithCurrentMonthExpenses(string userId, string month, string year)
         {
             List<ExpenseCategory> result = new List<ExpenseCategory>();
             result = _context.ExpenseCategories
@@ -105,7 +105,7 @@ namespace ExpenseTracker.Data.Repositories
             return result;
         }
 
-        public List<ExpenseCategory> GetExpenseCategoriesWithExpenses(string userId)
+        public IEnumerable<ExpenseCategory> GetExpenseCategoriesWithExpenses(string userId)
         {
             List<ExpenseCategory> result = new List<ExpenseCategory>();
             result = _context.ExpenseCategories

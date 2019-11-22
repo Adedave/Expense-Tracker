@@ -25,7 +25,7 @@ namespace ExpenseTracker.Data.Repositories
             _context.SaveChanges();
         }
 
-        public List<Expense> FindExpensesByCategoryId(string userId, int expenseCategoryId)
+        public IEnumerable<Expense> FindExpensesByCategoryId(string userId, int expenseCategoryId)
         {
             List<Expense> expenses = new List<Expense>();
             expenses = _context.Expenses
@@ -34,7 +34,7 @@ namespace ExpenseTracker.Data.Repositories
                         .ToList();
             return expenses;
         }
-        public List<Expense> FindExpensesByCategoryIdByMonth(string userId, int expenseCategoryId, DateTime month)
+        public IEnumerable<Expense> FindExpensesByCategoryIdByMonth(string userId, int expenseCategoryId, DateTime month)
         {
             List<Expense> expenses = new List<Expense>();
             expenses = _context.Expenses

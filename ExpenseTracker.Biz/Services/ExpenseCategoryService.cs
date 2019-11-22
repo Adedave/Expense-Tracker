@@ -62,7 +62,7 @@ namespace ExpenseTracker.Biz.Services
 
         public List<ExpenseCategory> GetExpenseCategoriesWithExpenses(string userId)
         {
-            return _expenseCategoryRepository.GetExpenseCategoriesWithExpenses(userId);
+            return _expenseCategoryRepository.GetExpenseCategoriesWithExpenses(userId).ToList();
         }
 
         public void UpdateCategory(ExpenseCategory category, string userId)
@@ -78,11 +78,11 @@ namespace ExpenseTracker.Biz.Services
 
         public List<ExpenseCategory> GetCategories(string userId)
         {
-            var categories = _expenseCategoryRepository.GetExpenseCategories(userId);
+            var categories = _expenseCategoryRepository.GetExpenseCategories(userId).ToList();
             if (categories.Count == 0)
             {
                 CopyAdminCategories(userId);
-                return _expenseCategoryRepository.GetExpenseCategories(userId);
+                return _expenseCategoryRepository.GetExpenseCategories(userId).ToList();
             }
             return categories;
         }
@@ -95,7 +95,7 @@ namespace ExpenseTracker.Biz.Services
 
         public List<ExpenseCategory> GetExpenseCategoriesWithCurrentMonthExpenses(string userId, string month, string year)
         {
-            return _expenseCategoryRepository.GetExpenseCategoriesWithCurrentMonthExpenses(userId, month, year);
+            return _expenseCategoryRepository.GetExpenseCategoriesWithCurrentMonthExpenses(userId, month, year).ToList();
         }
         public ExpenseCategory GetExpenseCategoryWithCurrentMonthExpenses(string userId,int categoryId, string month, string year)
         {

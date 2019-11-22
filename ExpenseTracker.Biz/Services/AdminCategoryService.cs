@@ -82,7 +82,7 @@ namespace ExpenseTracker.Biz.Services
 
         public List<AdminExpenseCategory> GetCategories()
         {
-            return _adminCategoryRepository.GetAdminCategories();
+            return _adminCategoryRepository.GetAdminCategories().ToList();
         }
 
         public List<AdminExpenseCategory> GetCategoriesByUserId(string userId)

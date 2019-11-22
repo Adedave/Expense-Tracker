@@ -7,7 +7,7 @@ namespace ExpenseTracker.Data.IRepositories
 {
     public interface IAdminCategoryRepository : IRepository<AdminExpenseCategory>
     {
-        List<AdminExpenseCategory> GetAdminCategories();
+        IEnumerable<AdminExpenseCategory> GetAdminCategories();
         IEnumerable<AdminExpenseCategory> GetCategoriesByUserId(string userId);
     }
 }

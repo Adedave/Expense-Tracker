@@ -69,7 +69,7 @@ namespace ExpenseTracker.Data.Repositories
             _context.SaveChanges();
         }
 
-        public List<Budget> GetCurrentMonthBudgets(string userId, string month, string year)
+        public IEnumerable<Budget> GetCurrentMonthBudgets(string userId, string month, string year)
         {
             List<Budget> result = new List<Budget>();
             result = _context.Budgets

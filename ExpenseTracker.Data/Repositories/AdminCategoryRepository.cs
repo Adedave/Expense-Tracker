@@ -43,7 +43,7 @@ namespace ExpenseTracker.Data.Repositories
 
         }
 
-        public List<AdminExpenseCategory> GetAdminCategories()
+        public IEnumerable<AdminExpenseCategory> GetAdminCategories()
         {
             var adminCategories = _context.AdminExpenseCategories
                                     .ToList();
