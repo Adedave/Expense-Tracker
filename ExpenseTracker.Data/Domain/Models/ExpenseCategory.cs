@@ -13,7 +13,7 @@ namespace ExpenseTracker.Data.Domain.Models
 
 
         //Navigation Property
-        public List<Expense> Expenses { get; set; } = new List<Expense>();
+        public ICollection<Expense> Expenses { get; set; } = new List<Expense>();
 
         public string AppUserId { get; set; }
         public AppUser AppUser { get; set; }

@@ -12,7 +12,7 @@ namespace ExpenseTracker.Data.Domain.Models
 
 
         //Navigation Property
-        public List<Income> Incomes { get; set; } = new List<Income>();
+        public ICollection<Income> Incomes { get; set; } = new List<Income>();
 
         public string AppUserId { get; set; }
         public AppUser AppUser { get; set; }
