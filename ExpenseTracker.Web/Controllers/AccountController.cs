@@ -8,6 +8,7 @@ using ExpenseTracker.Web.Models;
 using ExpenseTracker.Common;
 using ExpenseTracker.Biz.IServices;
 using System;
+using Hangfire;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -63,7 +64,7 @@ namespace ExpenseTracker.Web.Controllers
 
                     string cTokenLink = await GenerateEmailTokenAsync(user.Email);
 
-                    bool success = await SendConfirmationEmailAsync(user.Email, cTokenLink);
+                    await SendConfirmationEmailAsync(user.Email, cTokenLink);
                     
                     //ViewBag.ConfirmEmail = "Registration successful, kindly check your email to confirm your registration"; /*: "";*/
                     return RedirectToAction("Activate", new { email = user.Email });
@@ -97,21 +98,23 @@ namespace ExpenseTracker.Web.Controllers
             }
         }
 
-        private async Task<bool> SendConfirmationEmailAsync(string email, string cTokenLink)
+        private async Task SendConfirmationEmailAsync(string email, string cTokenLink)
         {
             var appUser = await _userManager.FindByEmailAsync(email);
             string message = await _viewRenderService.RenderToStringAsync("ConfirmEmailTemplate",email);
             message = message.Replace("{username}", appUser.UserName);
             message = message.Replace("{email}", appUser.Email);
             message = message.Replace("{confirmLink}", cTokenLink);
-            return await _emailService.ConfirmEmail(appUser.Email, message );
+            var jobId = BackgroundJob.Enqueue(
+                () => _emailService.ConfirmEmail(appUser.Email, message));
         }
 
         [AllowAnonymous]
         public async Task<IActionResult> ResendConfirmationEmailAsync(string email)
         {
             string confirmEmailTokenLink = await GenerateEmailTokenAsync(email);
-            bool success = await SendConfirmationEmailAsync(email, confirmEmailTokenLink);
+            //bool success = await SendConfirmationEmailAsync(email, confirmEmailTokenLink);
+            await SendConfirmationEmailAsync(email, confirmEmailTokenLink);
             return View("ConfirmEmail");
         }
 
@@ -288,14 +291,15 @@ namespace ExpenseTracker.Web.Controllers
             return View();
         }
 
-        private async Task<bool> SendResetPasswordEmail(string email, string resetPasswordLink)
+        private async Task SendResetPasswordEmail(string email, string resetPasswordLink)
         {
             var appUser = await _userManager.FindByEmailAsync(email);
             string message = await _viewRenderService.RenderToStringAsync("ResetPasswordTemplate", email);
             message = message.Replace("{username}", appUser.UserName);
             message = message.Replace("{email}", appUser.Email);
             message = message.Replace("{resetPasswordLink}", resetPasswordLink);
-            return await _emailService.ResetPassword(appUser.Email, message);
+            var jobId = BackgroundJob.Enqueue(
+               () => _emailService.ResetPassword(appUser.Email, message));
         }
 
         [AllowAnonymous]

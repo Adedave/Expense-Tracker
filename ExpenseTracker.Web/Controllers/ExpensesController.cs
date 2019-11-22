@@ -14,6 +14,7 @@ using ExpenseTracker.Biz.Services;
 using ExpenseTracker.Biz.IServices;
 using DevExtreme.AspNet.Data.ResponseModel;
 using ExpenseTracker.Common;
+using Hangfire;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -234,8 +235,9 @@ namespace ExpenseTracker.Web.Controllers
         {
             //if he is not active, he would not be logged in
             var appUser =  await _userManager.FindByEmailAsync(email);
-
-            await _budgetService.SendBudgetExceededMail(appUser.UserName, email, budgetStatus, category);
+            var jobId = BackgroundJob.Enqueue(
+      () =>  _budgetService.SendBudgetExceededMail(appUser.UserName, email, budgetStatus, category));
+            //await _budgetService.SendBudgetExceededMail(appUser.UserName, email, budgetStatus, category);
         }
 
         [HttpGet]
