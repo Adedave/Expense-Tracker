@@ -2,6 +2,7 @@
 using ExpenseTracker.Data.Domain.Models;
 using ExpenseTracker.Data.IRepositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,14 +16,16 @@ namespace ExpenseTracker.Biz.Services
     {
         private readonly IAdminCategoryRepository _adminCategoryRepository;
         private readonly UserManager<AppUser> _userManager;
+        private readonly ILogger<AdminCategoryService> _logger;
         private readonly IExpenseCategoryService _expenseCategoryService;
 
         public AdminCategoryService(IAdminCategoryRepository adminCategoryRepository, 
-            UserManager<AppUser> userManager,
+            UserManager<AppUser> userManager, ILogger<AdminCategoryService> logger,
             IExpenseCategoryService expenseCategoryService)
         {
             _adminCategoryRepository = adminCategoryRepository;
             _userManager = userManager;
+            _logger = logger;
             _expenseCategoryService = expenseCategoryService;
         }
 
@@ -48,6 +51,7 @@ namespace ExpenseTracker.Biz.Services
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
+                _logger.LogCritical(ex.StackTrace);
             }
         }
 
@@ -62,12 +66,13 @@ namespace ExpenseTracker.Biz.Services
                 {
                     _expenseCategoryService.AddCategoryWithoutSaveChanges(catName, item);
                 }
+                _expenseCategoryService.SaveChanges();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
+                _logger.LogCritical(ex.StackTrace);
             }
-            _expenseCategoryService.SaveChanges();
         }
 
         public void DeleteCategory(AdminExpenseCategory category)

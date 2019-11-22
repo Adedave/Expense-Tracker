@@ -1,6 +1,7 @@
 ﻿using ExpenseTracker.Biz.IServices;
 using ExpenseTracker.Data.Domain.Models;
 using ExpenseTracker.Data.IRepositories;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,10 +13,13 @@ namespace ExpenseTracker.Biz.Services
     public class BankAccountService : IBankAccountService
     {
         private readonly IBankAccountRepository _bankAccountRepository;
+        private readonly ILogger<BankAccountService> _logger;
 
-        public BankAccountService(IBankAccountRepository bankAccountRepository)
+        public BankAccountService(IBankAccountRepository bankAccountRepository,
+            ILogger<BankAccountService> logger)
         {
             _bankAccountRepository = bankAccountRepository;
+            _logger = logger;
         }
 
         public List<BankAccount> GetBankAccounts(string userId)
@@ -52,6 +56,7 @@ namespace ExpenseTracker.Biz.Services
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
+                _logger.LogCritical(ex.StackTrace);
             }
             return IsExists;
         }

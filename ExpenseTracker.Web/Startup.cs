@@ -142,7 +142,7 @@ namespace ExpenseTracker.Web
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            //CreateAdmin.CreateAdminAccount(app.ApplicationServices, Configuration).Wait();
+            CreateAdmin.CreateAdminAccount(app.ApplicationServices, Configuration).Wait();
         }
     }
 }

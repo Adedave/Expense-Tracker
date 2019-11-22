@@ -7,6 +7,7 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using NLog.Web;
 
 namespace ExpenseTracker.Web
 {
@@ -14,14 +15,34 @@ namespace ExpenseTracker.Web
     {
         public static void Main(string[] args)
         {
-            var host = CreateWebHostBuilder(args).Build();
-            host.Run();
+            var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+            try
+            {
+                logger.Debug("init main function");
+                CreateWebHostBuilder(args).Build().Run();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Error in init");
+                throw;
+            }
+            finally
+            {
+                NLog.LogManager.Shutdown();
+            }
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
             .UseDefaultServiceProvider(options =>
-                    options.ValidateScopes = false);
+                    options.ValidateScopes = false)
+            .ConfigureLogging(logging =>
+            {
+                logging.ClearProviders();
+                logging.AddConsole();
+                logging.SetMinimumLevel(LogLevel.Information);
+            })
+            .UseNLog();
     }
 }

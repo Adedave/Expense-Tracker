@@ -6,14 +6,22 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ExpenseTracker.Web.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 
 namespace ExpenseTracker.Web.Controllers
 {
+    [AllowAnonymous]
     public class HomeController : Controller
     {
-        [AllowAnonymous]
+        private readonly ILogger<HomeController> _logger;
+
+        public HomeController(ILogger<HomeController> logger)
+        {
+            _logger = logger;
+        }
         public IActionResult Index()
         {
+            _logger.LogInformation("HomeController.Index method called!!!");
             return View();
         }
 

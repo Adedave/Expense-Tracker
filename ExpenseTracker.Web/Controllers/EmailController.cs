@@ -25,6 +25,7 @@ using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using ExpenseTracker.Biz.IServices;
 using ExpenseTracker.Web.Configuration;
+using Microsoft.Extensions.Logging;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -38,13 +39,16 @@ namespace ExpenseTracker.Web.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IBankAccountService _bankAccountService;
         private readonly IGoogleOAuthService _googleOAuthService;
+        private readonly ILogger<EmailController> _logger;
 
         public EmailController(ExpenseTrackerDbContext context,OAuthConfig oAuthConfig, 
-            UserManager<AppUser> userManager, IBankAccountService bankAccountService, IGoogleOAuthService googleOAuthService)
+            UserManager<AppUser> userManager, IBankAccountService bankAccountService,
+            IGoogleOAuthService googleOAuthService, ILogger<EmailController> logger)
         {
             _userManager = userManager;
             _bankAccountService = bankAccountService;
             _googleOAuthService = googleOAuthService;
+            _logger = logger;
             _context = context;
             _oAuthConfig = oAuthConfig;
         }
@@ -83,6 +87,7 @@ namespace ExpenseTracker.Web.Controllers
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
+                _logger.LogError(ex.StackTrace);
             }
             TempData["Message"] = "Bank account added successfully!";
             return RedirectToAction("Index", "BankAccount");
@@ -249,6 +254,7 @@ namespace ExpenseTracker.Web.Controllers
             catch (ImapResponseException ex)
             {
                 Debug.WriteLine(ex.Message);
+                _logger.LogError(ex.StackTrace);
                 googleAuth.AccessToken = await RefreshAccessToken(googleAuth.RefreshToken);
                 UpdateGoogleOAuth(googleAuth);
                 await GetBankTransactions(accountNumber);
@@ -256,7 +262,8 @@ namespace ExpenseTracker.Web.Controllers
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-               //log exception 
+                //log exception 
+                _logger.LogError(ex.StackTrace);
             }
             return RedirectToAction("Index","BankTransaction",new { accountId = bankAccount.BankAccountId });
         }
@@ -289,6 +296,7 @@ namespace ExpenseTracker.Web.Controllers
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
+                _logger.LogError(ex.StackTrace);
             }
             return googleAuth;
         }
@@ -337,6 +345,7 @@ namespace ExpenseTracker.Web.Controllers
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
+                _logger.LogError(ex.StackTrace);
             }
             return IsExists;
         }
@@ -535,6 +544,7 @@ namespace ExpenseTracker.Web.Controllers
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
+                _logger.LogError(ex.StackTrace);
             }
             return transactionDetails;
         }

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using ExpenseTracker.Biz.IServices;
+using Microsoft.Extensions.Logging;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -23,16 +24,18 @@ namespace ExpenseTracker.Web.Controllers
     {
         private readonly IExpenseCategoryService _expenseCategoryService;
         private readonly ExpenseTrackerDbContext _context;
+        private readonly ILogger<ExpensesCategoryController> _logger;
         private readonly UserManager<AppUser> _userManager;
         private readonly IBudgetService _budgetService;
 
         public ExpensesCategoryController(IExpenseCategoryService expenseCategoryService,
-            ExpenseTrackerDbContext context,
+            ExpenseTrackerDbContext context, ILogger<ExpensesCategoryController> logger,
             UserManager<AppUser> userManager, 
             IBudgetService budgetService)
         {
             _expenseCategoryService = expenseCategoryService;
             _context = context;
+            _logger = logger;
             _userManager = userManager;
             _budgetService = budgetService;
         }
@@ -149,13 +152,21 @@ namespace ExpenseTracker.Web.Controllers
 
         public IActionResult DeleteCategory(int id)
         {
-            var category = _expenseCategoryService.GetCategoryById(id);
-            if (category == null)
+            try
             {
-                return NotFound();
+                var category = _expenseCategoryService.GetCategoryById(id);
+                if (category == null)
+                {
+                    return NotFound();
+                }
+                _expenseCategoryService.DeleteCategory(category);
+                TempData["Message"] = $"Category \"{category.Name}\" deleted successfully!";
+
             }
-            _expenseCategoryService.DeleteCategory(category);
-            TempData["Message"] = $"Category \"{category.Name}\" deleted successfully!";
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.StackTrace);
+            }
             return RedirectToAction("Index");
         }
 

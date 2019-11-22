@@ -41,6 +41,11 @@
   <ItemGroup>
     <Folder Include="Areas\Admin\Data\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Update="nlog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <ProjectExtensions>
     <VisualStudio>
       <UserProperties DismissedDevExtremeVersion="19.2.3" />
