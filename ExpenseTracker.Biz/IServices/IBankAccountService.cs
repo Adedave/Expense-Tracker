@@ -15,7 +15,7 @@ namespace ExpenseTracker.Biz.IServices
         bool RegisterBankAccountCheckIfExists(string accountNumber, string userId);
         bool UpdateBankAccountCheckIfExists(int bankAccountId, string accountNumber, string userId);
         void SetIsConnectedProperty(int bankAccountId);
-        void SetAboutToConnectProperty(string accountNumber);
+        void SetAboutToConnectProperty(string accountNumber, string userId);
 
     }
 }

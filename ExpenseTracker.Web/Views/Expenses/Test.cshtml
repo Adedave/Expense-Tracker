@@ -1,8 +1,54 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
     Layout = null;
+}
+@{
+    DateTime currentEnd = ViewBag.CurrentEnd;
+    DateTime previousEnd = ViewBag.PreviousEnd;
+    string previousEndString = previousEnd.ToString();
+    DateTime nextEnd = ViewBag.NextEnd;
+    string nextEndString = nextEnd.ToString();
+    string currentEndString = currentEnd.ToString();
+    string dateTimeNowString = DateTime.Now.ToString();
+}
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            <div class="form-inline" style="display:inline-table;">
+                <label>Find by category:&nbsp;&nbsp; </label>@Html.DropDownList("categoryId", new SelectList(ViewBag.CategoryList, "Id", "Name"), "select  category", new { id = @ViewData["CurrentFilter"], @class = "validate-select form-control" })
+                <input type="hidden" name="end" value="@currentEndString" />
+                <input type="hidden" name="timePeriod" value="@ViewBag.CurrentTimePeriod" />
+            </div>
+            <br />
+            <input type="submit" value="Search" class="btn btn-yellow" /> |
+            <a class="" asp-action="Index" asp-route-end="@currentEndString" asp-route-timePeriod="@ViewBag.CurrentTimePeriod">Back to Full List</a>
+        </p>
+    </div>
+</form>
+<details class="dropdown" style="float:right;clear:both;">
+    <summary class="btn"
+             aria-haspopup="false">Time Period</summary>
+    <ul class="dropdown-content">
+        <li><a asp-action="Index" asp-route-end="@dateTimeNowString" asp-route-timePeriod="Today">Today</a></li>
+        <li><a asp-action="Index" asp-route-end="@currentEndString" asp-route-timePeriod="LastWeek">Weekly</a></li>
+        <li><a asp-action="Index" asp-route-end="@currentEndString" asp-route-timePeriod="LastTwoWeeks">Bi-Weekly</a></li>
+        <li><a asp-action="Index" asp-route-end="@currentEndString" asp-route-timePeriod="LastMonth">Monthly</a></li>
+    </ul>
+</details>
+
+@{string cTPeriod = ViewBag.CurrentTimePeriod;
+    cTPeriod = cTPeriod.Contains("Last") ? cTPeriod.Remove(0, 4) : "Day"; }
+@if ((DateTime.Now.Date - currentEnd.Date).TotalDays >= 1 && ViewBag.CurrentTimePeriod != "Today")
+{
+    //currentEnd.AddDays(-ViewBag.Days
+    <h3 style="clear:both;">Expenses from @previousEnd.AddDays(1).ToString("ddd, dd MMM yyy") to @currentEnd.ToString("ddd, dd MMM yyy")</h3>
+}
+else if (ViewBag.CurrentTimePeriod == "Today")
+{
+    <h3 style="clear:both;">Your expenses on @currentEnd.ToString("ddd, dd MMM yyy")</h3>
+}
+else
+{
+    <h3 style="clear:both;">Your expenses this @cTPeriod from @previousEnd.AddDays(1).ToString("ddd, dd MMM yyy") to @currentEnd.ToString("ddd, dd MMM yyy")</h3>
 }
 <!DOCTYPE html>
 <html>
@@ -10,6 +56,7 @@
     <title>Test Scroll Page</title>
 </head>
 <body>
+
     <table class="table table-striped table-bordered">
         <thead>
             <tr>
@@ -30,12 +77,7 @@
                 </th>
             </tr>
         </thead>
-        <tbody id="container">
-           
-               
-            
-
-        </tbody>
+        <tbody id="container"></tbody>
     </table>
     <div id="progress" style="display:none">
         <h4>Loading...</h4>
@@ -70,18 +112,18 @@
                         for (var i = 0; i < data.length; i++) {
                             let c = i + 1;
                             $("#container").append(
-                                "<tr>"+
+                                "<tr>" +
                                 "<td>" + c + "</td>" +
                                 "<td>" +
                                 data[i].expense + "</td>" +
                                 "<td>" +
                                 new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(data[i].costOfExpense)
-                                 + "</td>" +
+                                + "</td>" +
                                 "<td>" +
                                 data[i].categoryId + "</td>" +
                                 "<td>" +
                                 new Intl.DateTimeFormat('en-GB').format(new Date(Date.parse((data[i].dateOfExpense))))
-                                 + "</td>" +
+                                + "</td>" +
                                 "</tr>");
                         }
                         pageIndex++;
@@ -98,6 +140,72 @@
                 }
             });
         }
+        var fnCatID = function GetCategoryName(catId) {
+            $.ajax({
+                type: 'GET',
+                url: '/ExpensesCategory/GetCategory',
+                data: { "id": catId },
+                dataType: 'json',
+                success: function (data) {
+                    $("#container").append(
+                        "<td>" + data + "</td>");
+                },
+                async: false
+            });
+        }
     </script>
+
+    <script type="text/javascript">
+
+        function GetIndex() {
+            var timePeriod = $("#timePeriods").val();
+            var endDate = new Intl.DateTimeFormat('en-GB').format(new Date((@currentEnd.ToString("yyyy/MM/dd"))));
+            $.ajax({
+                type: 'GET',
+                url: '/Expenses/Index',
+                data: { "end": "10/21/2019", "timePeriod": timePeriod },
+                dataType: 'json',
+                success: function (data) {
+                    if (data != null) {
+                        return data;
+                    }
+                }
+            });
+            }
+    </script>
+
+    @*<div class="d-inline-block">*@
+    @*<form asp-action="Index" method="post">
+            <input type="hidden" name="end" value="@previousEndString" />
+            <input type="hidden" name="timePeriod" value="@ViewBag.CurrentTimePeriod" />
+            <input type="hidden" name="categoryId" value="@ViewBag.CategoryId" />
+            <button type="submit" class="btn btn-yellow">Previous @cTPeriod</button>
+        </form>*@
+    <a class="btn btn-yellow" asp-action="Index" asp-route-end="@previousEndString" asp-route-timePeriod="@ViewBag.CurrentTimePeriod" asp-route-categoryId="@ViewBag.CategoryId">
+        Previous @*cTPeriod*@
+    </a> |
+    @if ((DateTime.Now.Date - currentEnd.Date).TotalDays >= 1)
+    {
+        <a class="btn btn-yellow" asp-action="Index" asp-route-end="@nextEndString" asp-route-timePeriod="@ViewBag.CurrentTimePeriod" asp-route-categoryId="@ViewBag.CategoryId">
+            Next @*cTPeriod*@
+        </a>
+        @*<form asp-action="Index" method="post">
+                <input type="hidden" name="end" value="@nextEndString" />
+                <input type="hidden" name="timePeriod" value="@ViewBag.CurrentTimePeriod" />
+                <input type="hidden" name="categoryId" value="@ViewBag.CategoryId" />
+                <button type="submit" class="btn btn-yellow">Next @cTPeriod</button>
+            </form>*@
+        @: |
+    }
+    @*<form asp-action="Index" method="post">
+            <input type="hidden" name="end" value="@dateTimeNowString" />
+            <input type="hidden" name="timePeriod" value="@ViewBag.CurrentTimePeriod" />
+            <input type="hidden" name="categoryId" value="@ViewBag.CategoryId" />
+            <button type="submit" class="btn btn-yellow" data-dismiss="modal">This @cTPeriod</button>
+        </form>*@
+    <a class="btn btn-yellow" asp-action="Index" asp-route-end="@dateTimeNowString" asp-route-timePeriod="@ViewBag.CurrentTimePeriod" asp-route-categoryId="@ViewBag.CategoryId">
+        This @*cTPeriod*@
+    </a>
+    @*</div>*@
 </body>
 </html>

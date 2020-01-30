@@ -358,14 +358,14 @@ namespace ExpenseTracker.Web.Controllers
             _context.SaveChanges();
         }
 
-        public IActionResult GoogleOAuth(string accountNumber)
+        public IActionResult GoogleOAuth(string accountNumber, string userId)
         {
-            _bankAccountService.SetAboutToConnectProperty(accountNumber);
-            string redirectUri = _oAuthConfig.RedirectUri; /* _configuration["OAUTH:redirectUri"];*/
+            _bankAccountService.SetAboutToConnectProperty(accountNumber, userId);
+            string redirectUri = _oAuthConfig.Providers[0].RedirectUri; /* _configuration["OAUTH:redirectUri"];*/
 
-            string clientID = _oAuthConfig.ClientId;  /*_configuration["OAUTH:clientID"];*/
+            string clientID = _oAuthConfig.Providers[0].ClientId;  /*_configuration["OAUTH:clientID"];*/
 
-            string clientSecret = _oAuthConfig.ClientSecret;  /*_configuration["OAUTH:clientSecret"];*/
+            string clientSecret = _oAuthConfig.Providers[0].ClientSecret;  /*_configuration["OAUTH:clientSecret"];*/
 
 
             var clientSecrets = new ClientSecrets
@@ -403,14 +403,14 @@ namespace ExpenseTracker.Web.Controllers
             return bankAccount;
         }
 
-        public async Task<GoogleAuth> GetAccessToken(string code)
+        private async Task<GoogleAuth> GetAccessToken(string code)
         {
             TokenResponse tokenResponse = new TokenResponse();
-            string redirectUri = _oAuthConfig.RedirectUri; 
+            string redirectUri = _oAuthConfig.Providers[0].RedirectUri; 
 
-            string clientID = _oAuthConfig.ClientId; 
+            string clientID = _oAuthConfig.Providers[0].ClientId; 
 
-            string clientSecret = _oAuthConfig.ClientSecret; 
+            string clientSecret = _oAuthConfig.Providers[0].ClientSecret; 
 
             string basUrl = "https://www.googleapis.com/oauth2/v4/token/";
             string body = "code=" + code + "&client_id=" + clientID + "&client_secret=" + clientSecret + "&grant_type=authorization_code&redirect_uri=" + redirectUri;
@@ -447,11 +447,11 @@ namespace ExpenseTracker.Web.Controllers
         {
             TokenResponse tokenResponse = new TokenResponse();
 
-            string redirectUri = _oAuthConfig.RedirectUri;
+            string redirectUri = _oAuthConfig.Providers[0].RedirectUri;
 
-            string clientID = _oAuthConfig.ClientId;
+            string clientID = _oAuthConfig.Providers[0].ClientId;
 
-            string clientSecret = _oAuthConfig.ClientSecret;
+            string clientSecret = _oAuthConfig.Providers[0].ClientSecret;
 
             string basUrl = "https://www.googleapis.com/oauth2/v4/token/";
 

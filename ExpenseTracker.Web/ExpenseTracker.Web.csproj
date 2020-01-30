@@ -22,6 +22,7 @@
     <PackageReference Include="DevExtreme.AspNet.Core" Version="19.2.3" />
     <PackageReference Include="DevExtreme.Web" Version="19.2.3" />
     <PackageReference Include="Google.Apis.Auth" Version="1.41.1" />
+    <PackageReference Include="Google.Apis.Oauth2.v2" Version="1.41.1.1602" />
     <PackageReference Include="Mail.dll" Version="3.0.19162.1801" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />

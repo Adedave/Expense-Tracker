@@ -170,6 +170,7 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RecordTransaction(Expense bankExpense,int bankTransactionId)
         {
 
@@ -255,6 +256,7 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteTransaction(int id)
         {
             var bankTransaction = await FindBankTransaction(id);

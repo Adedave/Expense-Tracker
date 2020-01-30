@@ -14,6 +14,11 @@
     <link rel="stylesheet" href="~/css/solid.css">
     <link href="~/css/site.css" rel="stylesheet" />
 
+    @*<link rel="stylesheet" href="~/assets/datatables/datatables.net-select-bs4/css/">*@
+    <link rel="stylesheet" href="~/assets/datatables/datatables.net-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/assets/datatables/datatables.net-buttons-bs4/css/buttons.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/assets/datatables/datatables.net-select-bs4/css/select.bootstrap4.min.css">
+
     <!-- DevExtreme themes -->
     <link rel="stylesheet" href="~/css/devextreme/dx.common.css">
     <link rel="stylesheet" href="~/css/devextreme/dx.light.css">
@@ -151,14 +156,33 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
+    @*<script src="~/lib/momentjs/moment.min.js"></script>*@
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    //
+    //
+    <script src="~/assets/datatables/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/assets/datatables/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="~/assets/datatables/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/assets/datatables/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/assets/datatables/datatables.net-buttons-bs4/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/assets/datatables/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/assets/datatables/datatables.net-buttons/js/buttons.flash.min.js"></script>
+    <script src="~/assets/datatables/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script src="~/assets/datatables/cdnjs/jszip.min.js"></script>
+    <script src="~/assets/datatables/cdnjs/pdfmake.min.js"></script>
+    <script src="~/assets/datatables/cdnjs/vfs_fonts.js"></script>
+    <script src="~/assets/datatables/datatables.net-select/js/dataTables.select.min.js"></script>
     <script src="~/assets/js/jquery.slicknav.min.js"></script>
     <script src="~/assets/js/slick.min.js"></script>
     <script src="~/assets/js/touchswipe.min.js"></script>
     <script src="~/assets/js/skrollr.min.js"></script>
     <script src="~/assets/js/jquery.countTo.min.js"></script>
     <script src="~/assets/js/script.js"></script>
+    @*<script src="~/assets/js/popper.min.js"></script>*@
     <script src="~/assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.js'></script>
+    <script charset="utf8" type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.20/sorting/datetime-moment.js"></script>
     <script>
 
         // Get the container element
@@ -183,6 +207,7 @@
         }
     </script>
     @RenderSection("Scripts", required: false)
+
     @*<script defer>
           window.VerifaliaWidgetConfig = {
             appKey: 'f94b6c79dad6466195526585474d1bf3'

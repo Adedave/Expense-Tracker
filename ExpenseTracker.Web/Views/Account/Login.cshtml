@@ -26,12 +26,34 @@
 </style>
 <div class="wrapper" id="login">
     <div class="inner">
-       
-        <div class="text-danger" asp-validation-summary="All"></div>
-        
         <form class="form-horizontal my-90" asp-action="Login" method="post">
             <h3 class="section-title-small text-center mb-50">Login</h3>
-            <input type="hidden" name="returnUrl" value="@ViewBag.returnUrl" />
+            <div class="text-danger" asp-validation-summary="All"></div>
+            @if (ViewBag.NotVerified != null)
+            {
+                <div class="alert alert-danger alert-dismissible show" role="alert">
+                    <i class="fas fa-ban"></i>
+                    @ViewBag.NotVerified
+                    <a class="text-info" asp-action="ResendConfirmationEmailAsync" asp-route-email="@Model?.Email">
+                        Request a new email.
+                    </a>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+            
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-info alert-dismissible show" role="alert">
+                    <i class="fas fa-check"></i>
+                    @TempData["Message"]
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+            <input type="hidden" asp-for="ReturnUrl" />
             <div class="row">
                 <div class="col-sm-12">
                     <label>Email</label>
@@ -53,12 +75,18 @@
             </div>
             <div class="form-group" style="margin-left:10px;">
                 <p>
-                    <a asp-action="ForgotPassword" style="color:white;float:left;" >Forgot your password?</a>
+                    <a asp-action="ForgotPassword" style="color:white;float:left;">Forgot your password?</a>
                 </p>
                 <p>
-                    <br/>
+                    <br />
                     <a asp-action="Register" asp-route-returnUrl="@ViewBag.returnUrl" style="color:white;">Register as a new user</a>
                 </p>
+            </div>
+            <div class="text-center">
+                <a asp-action="ExternalLogin" class="btn btn-warning" asp-route-provider="Google" title="Login with Google">Google Log In</a>
+                <a asp-action="ExternalLogin" class="btn btn-warning" asp-route-provider="Facebook" title="Login with Facebook">Facebook Log In</a>
+            </div>
+            <div class="text-right">
             </div>
         </form><!-- form-horizontal -->
     </div>

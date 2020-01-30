@@ -49,6 +49,7 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RegisterAccount(BankAccountViewModel bankAccount)
         {
             if (!ModelState.IsValid)
@@ -76,7 +77,7 @@ namespace ExpenseTracker.Web.Controllers
                 BankName = bankAccount.BankName
             };
             _bankAccountService.AddBankAccount(account);
-            return RedirectToAction("GoogleOAuth", "Email",new { accountNumber = account.AccountNumber });
+            return RedirectToAction("GoogleOAuth", "Email",new { accountNumber = account.AccountNumber, userId = account.AppUserId });
         }
 
         [HttpGet]
@@ -104,6 +105,7 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult UpdateAccount(BankAccountViewModel viewModel)
         {
             if (!ModelState.IsValid)

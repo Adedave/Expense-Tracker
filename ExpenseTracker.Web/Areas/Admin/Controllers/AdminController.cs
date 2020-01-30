@@ -78,6 +78,7 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
         public IActionResult Create() => View();
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateModel model)
         {
             if (ModelState.IsValid)
@@ -121,6 +122,7 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, string email, string password)
         {
             AppUser user = await _userManager.FindByIdAsync(id);
@@ -170,13 +172,40 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
         #endregion
 
         [HttpPost]
-        public async Task<IActionResult> Delete(string id)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Deactivate(string id)
         {
             AppUser user = await _userManager.FindByIdAsync(id);
             if (user != null)
             {
                 user.IsActive = false;
                 IdentityResult result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    TempData["Message"] = $"User \"{user.UserName}\" was deactivated successfully!";
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    AddErrorsFromResult(result);
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "User Not Found");
+            }
+            var allUsers = _userManager.Users.ToList();
+            var activeUsers = allUsers.RemoveAll(x => x.IsActive == false);
+            return View("Index", allUsers);
+        }
+
+        public async Task<IActionResult> Delete(string id)
+        {
+            AppUser user = await _userManager.FindByIdAsync(id);
+            if (user != null)
+            {
+                user.IsActive = false;
+                IdentityResult result = await _userManager.DeleteAsync(user);
                 if (result.Succeeded)
                 {
                     TempData["Message"] = $"User \"{user.UserName}\" was deleted successfully!";

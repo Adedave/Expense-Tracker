@@ -60,7 +60,7 @@ namespace ExpenseTracker.Web.Controllers
         //    var expenses = query.ToList();
         //    return Json(expenses);
         //}
-       
+
 
         //[HttpGet]
         //public async Task<LoadResult> Get(DataSourceLoadOptions loadOptions)
@@ -72,13 +72,22 @@ namespace ExpenseTracker.Web.Controllers
         //    return DataSourceLoader.Load(expenses, loadOptions);
         //}
 
+        public async Task<IActionResult> GetAllExpenses()
+        {
+            var user = await GetCurrentUser();
+
+            var expenses = _expenseService.GetAllExpenses(user.Id);
+
+            return Json(expenses);
+        }
+
         public async Task<IActionResult> Index(string end, string timePeriod = "LastWeek", int categoryId = 0)
         {
             end = end ?? DateTime.Now.ToString();
 
             DateTime currentEnd = Convert.ToDateTime(end);
             ViewBag.CurrentEnd = currentEnd;
-            
+
             int days = SwitchDays(timePeriod);
             ViewBag.Days = days;
             ViewBag.PreviousEnd = currentEnd.AddDays(-days);
@@ -90,11 +99,11 @@ namespace ExpenseTracker.Web.Controllers
 
             ViewBag.CategoryList = _expenseCategoryService.GetCategories(user.Id);
 
-            var expenses = _expenseService.GetExpensesPerTimePeriod(user.Id,categoryId,timePeriod,end);
-
+            //var expenses = _expenseService.GetExpensesPerTimePeriod(user.Id, categoryId, timePeriod, end);
+            var expenses = _expenseService.GetAllExpenses(user.Id);
             return View(expenses);
         }
-       
+
         private int SwitchDays(string timePeriod)
         {
             int days = 0;
@@ -196,8 +205,10 @@ namespace ExpenseTracker.Web.Controllers
             }
             return end;
         }
-        
+
+
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddExpenses(Expense expenses)
          {
             var user = await GetCurrentUser();
@@ -236,7 +247,7 @@ namespace ExpenseTracker.Web.Controllers
             //if he is not active, he would not be logged in
             var appUser =  await _userManager.FindByEmailAsync(email);
             var jobId = BackgroundJob.Enqueue(
-      () =>  _budgetService.SendBudgetExceededMail(appUser.UserName, email, budgetStatus, category));
+                () =>  _budgetService.SendBudgetExceededMail(appUser.UserName, email, budgetStatus, category));
             //await _budgetService.SendBudgetExceededMail(appUser.UserName, email, budgetStatus, category);
         }
 
@@ -277,6 +288,7 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateExpenses(Expense expenses)
         {
             var user = await GetCurrentUser();
@@ -303,6 +315,7 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteExpenses(int id)
         {
             var expense = await GetById(id);

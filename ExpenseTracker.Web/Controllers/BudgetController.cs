@@ -88,6 +88,7 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateBudget(Budget budget)
         {
             var user = await GetCurrentUser();
@@ -123,24 +124,22 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult UpdateBudget(Budget budget)
         {
             if (budget == null || !ModelState.IsValid)
             {
                 return View(budget);
             }
-            if (_budgetService.BudgetExists(budget))
-            {
-                ModelState.AddModelError("", "A budget has already been created for this month. Consider editing it ");
-                return View(budget);
-            }
-            _budgetService.UpdateBudget(budget);
+
+            var updatedBudget = _budgetService.UpdateBudget(budget);
             
-            TempData["Message"] = $"Budget for \"{budget?.Category?.Name} category\" was updated successfully!";
+            TempData["Message"] = $"Budget for \"{updatedBudget?.Category?.Name} category\" was updated successfully!";
             return RedirectToAction("Index", new { month = budget.Month, year = budget.Year });
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             var budget = _budgetService.GetById(id);

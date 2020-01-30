@@ -54,6 +54,7 @@ namespace ExpenseTracker.Data.Repositories
             List<Expense> result = new List<Expense>();
             result = _context.Expenses
                 .Where(x => x.AppUserId == userId)
+                .OrderByDescending(x => x.DateOfExpense)
                 .ToList();
             return result;
         }

@@ -43,6 +43,7 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Reminder reminder)
         {
             var user = await GetCurrentUser();
@@ -66,6 +67,7 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(Reminder reminder)
         {
             var user = await GetCurrentUser();
@@ -77,6 +79,7 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
             _reminderService.Deletereminder(id);

@@ -51,10 +51,17 @@
        
     <div class="wrapper">
     <div class="inner">
-                @*<h2>Register</h2>*@
         <form asp-action="Register" method="post">
             <h3 class="section-title-small text-center mb-50">Register</h3>
-
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-success alert-dismissible show" role="alert">
+                    @TempData["Message"]
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
             <div class="text-danger" asp-validation-summary="ModelOnly"></div>
             <div class="form-group">
                 <label asp-for="FirstName"></label>
@@ -81,10 +88,10 @@
             </div>
 
             @*<div class="form-group">
-                    <label for="exampleInputEmail1">Email address</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-                    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-                </div>*@
+            <label for="exampleInputEmail1">Email address</label>
+            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+        </div>*@
 
             <div class="form-group">
                 <label asp-for="Password"></label>
@@ -105,18 +112,24 @@
                 <br />
                 <span class="text-danger" asp-validation-for="TermsAndConditions"></span>
             </div>
-
-            @*<div class="form-group">
-                    <input style="margin:5px;" class="form-check-input" name="TermsAndConditions" value="true" type="checkbox" id="isAgreed">
-                    <label style="margin-left:30px;" for="TermsAndConditions"> I agree to <a class="yellow-text" style="text-decoration:underline;">the Terms and Condition</a></label>
-                </div>*@
-            <br />
             <div style="float:right;">
-                @*<a asp-action="Index" class="btn btn-warning">Cancel</a>*@
+
                 <button type="submit" class="btn btn-warning">Register</button>
             </div>
+            <br />
+            <div>
+                <br />
+                <p></p>
+            </div>
+            <br />
+            <div style="clear:both;" class="text-center">
+                <a asp-action="ExternalLogin" class="btn btn-warning" asp-route-provider="Google" title="Register with Google">Google</a>
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <a asp-action="ExternalLogin" class="btn btn-warning" asp-route-provider="Facebook" title="Register with Facebook">Facebook</a>
+            </div>
+
             <div class="form-group" style="clear:both;">
-                <br/>
+                <br />
                 <p>
                     <a asp-action="Login" style="color:white;">Existing User? Login here</a>
                 </p>

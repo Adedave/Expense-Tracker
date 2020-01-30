@@ -64,9 +64,10 @@ namespace ExpenseTracker.Biz.Services
             return _budgetRepository.GetById(id);
         }
 
-        public void UpdateBudget(Budget budget)
+        public Budget UpdateBudget(Budget budget)
         {
             _budgetRepository.Update(budget);
+            return GetById(budget.Id);
         }
 
         public Budget GetByCategory(int categoryId, string userId, string month, string year)

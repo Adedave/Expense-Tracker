@@ -110,6 +110,12 @@ namespace ExpenseTracker.Biz.Services
             return _expenseRepository.GetById(id);
         }
 
+        public IEnumerable<Expense> GetAllExpenses(string userId)
+        {
+            var expenses = _expenseRepository.GetAll(userId);
+            return expenses;
+        }
+
         public IEnumerable<Expense> GetExpensesPerTimePeriod(string userId,int categoryId,string timePeriod, string end)
         {
             DateTime endPeriod = Convert.ToDateTime(end);

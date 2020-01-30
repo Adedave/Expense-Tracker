@@ -5,16 +5,15 @@
 
 <div>
     <p>
-        <h3>Kindly Confirm Your Registration</h3>
-        <h4>An email has been sent to @ViewBag.Email with a confirmation link.</h4><br />
-        <h4>Kindly login to your email to confirm your registration.</h4><br />
+        <h3>Great, your account has been created!</h3>
+        <h4>Please check your mailbox <em>@ViewBag.Email</em> for instructions on verifying your registration.</h4><br />
         <h4>If you dont find this email in your Inbox within 15 minutes, kindly check your spam folder and mark the email as "Not Spam".</h4>
 
         <br />
         <h3>
-            Or request a new confirmation email
+            Or
             <a asp-action="ResendConfirmationEmailAsync" asp-route-email="@ViewBag.Email">
-                here
+                request a new confirmation email.
             </a>
         </h3>
 

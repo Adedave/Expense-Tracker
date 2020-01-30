@@ -93,9 +93,9 @@ namespace ExpenseTracker.Biz.Services
             }
         }
 
-        public void SetAboutToConnectProperty(string accountNumber)
+        public void SetAboutToConnectProperty(string accountNumber, string userId)
         {
-            var bankAccount = _bankAccountRepository.GetByAccountNumber(accountNumber);
+            var bankAccount = _bankAccountRepository.GetByAccountNumberAndUserId(accountNumber,userId);
             if (bankAccount != null)
             {
                 bankAccount.AboutToConnect = true;

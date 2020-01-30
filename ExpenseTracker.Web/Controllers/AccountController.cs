@@ -9,6 +9,8 @@ using ExpenseTracker.Common;
 using ExpenseTracker.Biz.IServices;
 using System;
 using Hangfire;
+using System.Linq;
+using ExpenseTracker.Web.Configuration;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -18,16 +20,19 @@ namespace ExpenseTracker.Web.Controllers
     {
         private UserManager<AppUser> _userManager;
         private readonly IEmailService _emailService;
+        private readonly OAuthConfig _oAuthConfig;
         private SignInManager<AppUser> _signInManager;
         private readonly IViewRenderService _viewRenderService;
 
         public AccountController(UserManager<AppUser> userMgr, IEmailService emailService,
-        SignInManager<AppUser> signinMgr, IViewRenderService viewRenderService)
+        SignInManager<AppUser> signinMgr, IViewRenderService viewRenderService,
+        OAuthConfig oAuthConfig)
         {
             _userManager = userMgr;
             _emailService = emailService;
             _signInManager = signinMgr;
             _viewRenderService = viewRenderService;
+            _oAuthConfig = oAuthConfig;
         }
 
         [AllowAnonymous]
@@ -40,8 +45,39 @@ namespace ExpenseTracker.Web.Controllers
             return View();
         }
 
+        
+        public async Task<IActionResult> CompleteProfile(string email)
+        {
+            var appUser = await _userManager.FindByEmailAsync(email);
+
+            RegisterViewModel registerViewModel = new RegisterViewModel()
+            {
+                Email = appUser.Email,
+                FirstName = appUser.FirstName,
+                LastName = appUser.LastName                
+            };
+
+            return View(registerViewModel);
+        }
+
+        //[HttpPost]
+        //public async Task<IActionResult> CompleteProfile(RegisterViewModel registerViewModel)
+        //{
+        //    var appUser = await _userManager.FindByEmailAsync(registerViewModel.Email);
+        //    appUser.PhoneNumber = re
+        //    RegisterViewModel registerViewModel = new RegisterViewModel()
+        //    {
+        //        Email = appUser.Email,
+        //        FirstName = appUser.FirstName,
+        //        LastName = appUser.LastName                
+        //    };
+
+        //    return View(registerViewModel);
+        //}
+
         [AllowAnonymous]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -60,14 +96,16 @@ namespace ExpenseTracker.Web.Controllers
                 if (result.Succeeded)
                 {
 
-                    await AddUserToARoleAsync(user.Email);
+                    await AddUserToUsersRoleAsync(user.Email);
 
                     string cTokenLink = await GenerateEmailTokenAsync(user.Email);
 
                     await SendConfirmationEmailAsync(user.Email, cTokenLink);
-                    
+
                     //ViewBag.ConfirmEmail = "Registration successful, kindly check your email to confirm your registration"; /*: "";*/
                     return RedirectToAction("Activate", new { email = user.Email });
+                    //TempData["Message"] = $"{expenses.NameOfExpense} expense added successfully!";
+                    //return RedirectToAction("Register");
                 }
                 else
                 {
@@ -84,7 +122,7 @@ namespace ExpenseTracker.Web.Controllers
             ViewBag.Email = appUser!=null ? email : "<Email Not Found>";
             return View();
         }
-        private async Task AddUserToARoleAsync(string userEmail)
+        private async Task AddUserToUsersRoleAsync(string userEmail)
         {
             AppUser registeredUser = await _userManager.FindByEmailAsync(userEmail);
             if (registeredUser != null)
@@ -115,7 +153,8 @@ namespace ExpenseTracker.Web.Controllers
             string confirmEmailTokenLink = await GenerateEmailTokenAsync(email);
             //bool success = await SendConfirmationEmailAsync(email, confirmEmailTokenLink);
             await SendConfirmationEmailAsync(email, confirmEmailTokenLink);
-            return View("ConfirmEmail");
+            TempData["Message"] = $"Email sent to {email}! Kindly check your inbox or spam to confirm your registration";
+            return RedirectToAction("Login");
         }
 
         private async Task<string> GenerateEmailTokenAsync(string userEmail)
@@ -144,7 +183,12 @@ namespace ExpenseTracker.Web.Controllers
                 return View("Error", new ErrorViewModel());
             }
             var result = await _userManager.ConfirmEmailAsync(user, token);
-            return View(result.Succeeded ? "EmailConfirmed" : "Error");
+            if (result.Succeeded)
+            {
+                TempData["Message"] = "This account has been activated. Kindly log in below";
+                return RedirectToAction("Login");
+            }
+            return View("Error", new ErrorViewModel());
         }
 
         private void AddErrorsFromResult(IdentityResult result)
@@ -156,14 +200,19 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [AllowAnonymous]
-        public IActionResult Login(string returnUrl)
+        public async Task<IActionResult> Login(string returnUrl)
         {
             if (User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Home");
             }
-            ViewBag.returnUrl = returnUrl;
-            return View();
+            LoginViewModel loginViewModel = new LoginViewModel
+            {
+                ReturnUrl = returnUrl,
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+            };
+            var c = TempData["Message"];
+            return View(loginViewModel);
         }
 
         [HttpPost]
@@ -181,7 +230,9 @@ namespace ExpenseTracker.Web.Controllers
                 AppUser user = await _userManager.FindByEmailAsync(details.Email);
                 if (!user.EmailConfirmed && user.IsActive == true)
                 {
-                    return RedirectToAction("Activate", new { email = user.Email });
+                    //return RedirectToAction("Activate", new { email = user.Email });
+                    ViewBag.NotVerified =  "You have not yet verified your account. Please check your mailbox for instructions on verifying your registration in order to log in";
+                    return View(details);
                 }
                 if (user != null && user.IsActive == true)
                 {
@@ -189,6 +240,7 @@ namespace ExpenseTracker.Web.Controllers
                     Microsoft.AspNetCore.Identity.SignInResult result =
                         await _signInManager.PasswordSignInAsync(
                     user, details.Password, details.RememberMe, false);
+                    var xc = HttpContext.User;
                     if (result.Succeeded)
                     {
                         return LocalRedirect(returnUrl ?? "/");
@@ -200,22 +252,33 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [AllowAnonymous]
-        public IActionResult GoogleLogin(string returnUrl)
+        public IActionResult ExternalLogin(string provider, string returnUrl)
         {
-            string redirectUrl = Url.Action("GoogleResponse", "Account",
+            string redirectUrl = Url.Action("ExternalLoginCallback", "Account",
             new { ReturnUrl = returnUrl });
             var properties = _signInManager
-            .ConfigureExternalAuthenticationProperties("Google", redirectUrl);
-            return new ChallengeResult("Google", properties);
+            .ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return new ChallengeResult(provider, properties);
         }
-
+        
         [AllowAnonymous]
-        public async Task<IActionResult> GoogleResponse(string returnUrl = "/")
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = "/", string remoteError = null)
         {
+            LoginViewModel loginViewModel = new LoginViewModel
+            {
+                ReturnUrl = returnUrl,
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+            };
+            if (remoteError != null)
+            {
+                ModelState.AddModelError("",$"Error from external provider: {remoteError}");
+                return View("Login",loginViewModel);
+            }
             ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                return RedirectToAction(nameof(Login));
+                ModelState.AddModelError("", $"Error loading external login information");
+                return View("Login", loginViewModel);
             }
             var result = await _signInManager.ExternalLoginSignInAsync(
             info.LoginProvider, info.ProviderKey, false);
@@ -225,34 +288,95 @@ namespace ExpenseTracker.Web.Controllers
             }
             else
             {
-                AppUser user = new AppUser
+                var success = await ExternallRegister(info);
+                if (success)
                 {
-                    Email = info.Principal.FindFirst(ClaimTypes.Email).Value,
-                    UserName =
-                info.Principal.FindFirst(ClaimTypes.Email).Value
-                };
-                IdentityResult identResult = await _userManager.CreateAsync(user);
-                if (identResult.Succeeded)
+
+                    return LocalRedirect(returnUrl);
+                }
+                ModelState.AddModelError("", $"Email claim not received from {info.LoginProvider}");
+                ModelState.AddModelError("", $"Please contact support on support@expensetracker.com");
+                return View("Login",loginViewModel);
+            }
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalRegister()
+        {
+            ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                ModelState.AddModelError("", $"Error loading external login information");
+                return View("Register", new RegisterViewModel());
+            }
+            var email = info.Principal.FindFirst(ClaimTypes.Email).Value;
+            var firstName = info.Principal.FindFirst(ClaimTypes.GivenName).Value;
+            var lastName = info.Principal.FindFirst(ClaimTypes.Surname).Value;
+
+            RegisterViewModel registerViewModel = new RegisterViewModel
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Email = email
+            };
+            ModelState.AddModelError("", $"Email claim not received from {info.LoginProvider}");
+            ModelState.AddModelError("", $"Please contact support on support@expensetracker.com");
+            return View("Register", registerViewModel);
+        }
+
+        private async Task<bool> ExternallRegister(ExternalLoginInfo info)
+        {
+            var email = info.Principal.FindFirst(ClaimTypes.Email).Value;
+            var firstName = info.Principal.FindFirst(ClaimTypes.GivenName).Value;
+            var lastName = info.Principal.FindFirst(ClaimTypes.Surname).Value;
+            if (email != null)
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user != null)
                 {
-                    identResult = await _userManager.AddLoginAsync(user, info);
+                    IdentityResult identResult = await _userManager.AddLoginAsync(user, info);
                     if (identResult.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, false);
-                        return LocalRedirect(returnUrl);
+                        return true;
                     }
                 }
-                return AccessDenied();
+                else
+                {
+                    user = new AppUser
+                    {
+                        Email = email,
+                        UserName = email,
+                        FirstName = firstName,
+                        LastName = lastName,
+                        IsActive = true
+                    };
+                    IdentityResult identityResult = await _userManager.CreateAsync(user);
+                    if (identityResult.Succeeded)
+                    {
+                        await AddUserToUsersRoleAsync(user.Email);
+                        identityResult = await _userManager.AddLoginAsync(user, info);
+                        if (identityResult.Succeeded)
+                        {
+                            await _signInManager.SignInAsync(user, false);
+                            return true;
+                        }
+                    }
+                }
             }
+            return false;
         }
 
         [AllowAnonymous]
         public IActionResult ForgotPassword()
         {
+
             return View();
         }
 
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [AllowAnonymous]
         public async Task<IActionResult> ForgotPassword(string email)
         {
@@ -321,6 +445,7 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [AllowAnonymous]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel resetPassword)
         {
@@ -356,7 +481,7 @@ namespace ExpenseTracker.Web.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Login");
+            return RedirectToAction("Index","Home");
         }
 
         [AllowAnonymous]

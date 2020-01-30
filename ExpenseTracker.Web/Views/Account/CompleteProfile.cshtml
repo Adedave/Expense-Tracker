@@ -1,0 +1,100 @@
+﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "Complete Your Profile";
+}
+<style>
+    /*.wrapper {
+        height: 300px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    section {
+        background-color:#FFD500;
+    }
+    .inner {
+        /*background-color: #3B3A36;
+        position: relative;
+        width: 535px;
+        border: double #3B3A36 2px;
+        padding: 50px;
+    }
+    */
+    section {
+        /*background-color: #FFD500;*/
+    }
+
+    .wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .inner {
+        background-color: #FFD500;
+        position: relative;
+        width: 535px;
+        border: hidden #3B3A36 2px;
+        border-radius: 25px;
+        padding: 20px 10px;
+        /*margin-top:-50px;
+        margin-bottom:-50px;*/
+    }
+</style>
+
+<div class="wrapper">
+    <div class="inner">
+        <form asp-action="CompleteProfile" method="post">
+            <h3 class="section-title-small text-center mb-50">Complete Your Profile</h3>
+            @if (TempData["Message"] != null)
+            {
+                <div class="alert alert-success alert-dismissible show" role="alert">
+                    @TempData["Message"]
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            }
+            <div class="text-danger" asp-validation-summary="ModelOnly"></div>
+            <div class="form-group">
+                <label asp-for="FirstName"></label>
+                <input asp-for="FirstName" class="form-control" placeholder="First name" />
+                <span class="text-danger" asp-validation-for="FirstName"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="LastName"></label>
+                <input asp-for="LastName" class="form-control" placeholder="Last name" />
+                <span class="text-danger" asp-validation-for="LastName"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" class="form-control" placeholder="email@example.com" />
+                <span class="text-danger" asp-validation-for="Email"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input asp-for="PhoneNumber" class="form-control" placeholder="Phone Number" />
+                <span class="text-danger" asp-validation-for="PhoneNumber"></span>
+            </div>
+            <div style="float:right;">
+
+                <button type="submit" class="btn btn-warning">Complete</button>
+            </div>
+            <br />
+            <div>
+                <br />
+                <p></p>
+            </div>
+            <br />
+           
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+}

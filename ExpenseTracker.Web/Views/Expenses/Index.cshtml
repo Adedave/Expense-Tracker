@@ -12,6 +12,8 @@
     string currentEndString = currentEnd.ToString();
     string dateTimeNowString = DateTime.Now.ToString();
 }
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" type="text/css" rel="stylesheet" />
+
 @if (TempData["Message"] != null)
 {
     <div class="alert alert-success alert-dismissible show" role="alert">
@@ -25,251 +27,181 @@
 <a class="btn btn-yellow" asp-action="AddExpenses">Add New Expense</a> |
 <a class="btn btn-yellow" asp-action="ExpensesInsights">Get Insights from your Expenses</a> |
 <a class="btn btn-yellow" asp-action="Create" asp-controller="Reminder">Set a reminder to input your Expenses</a><br /><br />
-<form asp-action="Index" method="get">
-    <div class="form-actions no-color">
-        <p>
-            <div class="form-inline" style="display:inline-table;">
-                <label>Find by category:&nbsp;&nbsp; </label>@Html.DropDownList("categoryId", new SelectList(ViewBag.CategoryList, "Id", "Name"), "select  category", new { id = @ViewData["CurrentFilter"], @class = "validate-select form-control" })
-                <input type="hidden" name="end" value="@currentEndString" />
-                <input type="hidden" name="timePeriod" value="@ViewBag.CurrentTimePeriod" />
+@*<form method="post">
+    
+            <div class="row">
+                <div class="col-md-12">
+
+                    <div class="input-daterange datepicker row align-items-center">
+                        <label class="col-md-2 col-form-label form-control-label">Date Range:</label>
+                        <div class="input-group col-md-2">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="ni ni-calendar-grid-58"></i></span>
+                            </div>
+                            <input class="form-control" placeholder="Start date" name="startDate" type="text" value="" required>
+                        </div>
+                        <label class="col-form-label form-control-label">To:</label>
+                        <div class="input-group col-md-2">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="ni ni-calendar-grid-58"></i></span>
+                            </div>
+                            <input class="form-control" placeholder="End date" name="endDate" type="text" value="" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="input-group col-2 offset-10">
+                            <input class="btn btn-yellow form-control" type="submit" value="Filter" />
+                        </div>
+                    </div>
+                </div>
             </div>
-            <br />
-            <input type="submit" value="Search" class="btn btn-yellow" /> |
-            <a class="" asp-action="Index" asp-route-end="@currentEndString" asp-route-timePeriod="@ViewBag.CurrentTimePeriod">Back to Full List</a>
-        </p>
-    </div>
 </form>
-<details class="dropdown" style="float:right;clear:both;">
-    <summary class="btn"
-             aria-haspopup="false">Time Period</summary>
-    <ul class="dropdown-content">
-        <li><a asp-action="Index" asp-route-end="@dateTimeNowString" asp-route-timePeriod="Today">Today</a></li>
-        <li><a asp-action="Index" asp-route-end="@currentEndString" asp-route-timePeriod="LastWeek">Weekly</a></li>
-        <li><a asp-action="Index" asp-route-end="@currentEndString" asp-route-timePeriod="LastTwoWeeks">Bi-Weekly</a></li>
-        <li><a asp-action="Index" asp-route-end="@currentEndString" asp-route-timePeriod="LastMonth">Monthly</a></li>
-    </ul>
-</details>
-@{string cTPeriod = ViewBag.CurrentTimePeriod;
-    cTPeriod = cTPeriod.Contains("Last") ? cTPeriod.Remove(0, 4) : "Day"; }
-@if ((DateTime.Now.Date - currentEnd.Date).TotalDays >= 1 && ViewBag.CurrentTimePeriod != "Today")
-{
-    //currentEnd.AddDays(-ViewBag.Days
-    <h3 style="clear:both;">Expenses from @previousEnd.AddDays(1).ToString("dd-MM-yyyy") to @currentEnd.ToString("dd-MM-yyyy")</h3>
-}
-else if (ViewBag.CurrentTimePeriod == "Today")
-{
-    <h3 style="clear:both;">Your expenses on @currentEnd.ToString("dd-MM-yyyy")</h3>
-}
-else
-{
-    <h3 style="clear:both;">Your expenses this @cTPeriod from @previousEnd.AddDays(1).ToString("dd-MM-yyyy") to @currentEnd.ToString("dd-MM-yyyy")</h3>
-}
-<table class="table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th>
-                S/N
-            </th>
-            <th>
-                EXPENSE DESCRIPTION
-            </th>
-            <th>
-                COST OF EXPENSE
-            </th>
-            <th>
-                EXPENSE CATEGORY
-            </th>
-            <th>
-                DATE OF EXPENSE
-            </th>
-            <th>
 
-            </th>
-        </tr>
-    </thead>
-    <tbody id="container">
-        @{int i = 0;}
-        @foreach (var item in Model)
-        {
-            i++;
+<div class="input-daterange datepicker row align-items-center">
+    <div class="col">
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="ni ni-calendar-grid-58"></i></span>
+                </div>
+                <input class="form-control" placeholder="Start date" type="text" value="06/18/2019">
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="ni ni-calendar-grid-58"></i></span>
+                </div>
+                <input class="form-control" placeholder="End date" type="text" value="06/22/2019">
+            </div>
+        </div>
+    </div>
+</div>*@
+<div class="table-responsive py-4" style="margin-top:20px;">
+    <table id="myTable" class="table table-striped table-flush table-bordered">
+        <thead>
             <tr>
-                <td>@i</td>
-                <td>@item.NameOfExpense</td>
-                <td>
-                    @{var toal = item.CostOfExpense.ToString("0,0.00"); }
-                    @("\u20A6")@toal
-                </td>
-                <td>
-                    @Categories.GetCategoryById(item.ExpenseCategoryId).Name
-                </td>
-                <td>
-                    @item.DateOfExpense.ToShortDateString()
-                </td>
-                <td>
-                    <a asp-action="UpdateExpenses" asp-route-id="@item.Id"><i class="fa fa-edit"></i></a>|
+                <th>
+                    S/N
+                </th>
+                <th>
+                    EXPENSE DESCRIPTION
+                </th>
+                <th>
+                    COST OF EXPENSE
+                </th>
+                <th>
+                    EXPENSE CATEGORY
+                </th>
+                <th>
+                    DATE OF EXPENSE
+                </th>
+                <th>
 
-                    <a id="deleteItem-@item.Id" data-target="#myModal-@item.Id" class="trigger-btn" data-toggle="modal" data-whatever="@item.Id"><i class="fa fa-trash"></i></a>
+                </th>
+            </tr>
+        </thead>
+        <tbody id="container">
+            @{int i = 0;}
+            @foreach (var item in Model)
+            {
+                i++;
+                <tr>
+                    <td>@i</td>
+                    <td>@item.NameOfExpense</td>
+                    <td>
+                        @{var toal = item.CostOfExpense.ToString("0,0.00"); }
+                        @("\u20A6")@toal
+                    </td>
+                    <td>
+                        @Categories.GetCategoryById(item.ExpenseCategoryId).Name
+                    </td>
+                    <td>
+                        @item.DateOfExpense.ToString("dd/MM/yyyy HH:mm:ss")
+                    </td>
+                    <td>
+                        <a asp-action="UpdateExpenses" asp-route-id="@item.Id"><i class="fa fa-edit"></i></a>|
 
-                    <!-- Modal HTML -->
-                    <div id="myModal-@item.Id" class="modal fade">
-                        <div class="modal-dialog modal-confirm">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <div class="icon-box">
-                                        <i class="fas fa-times"></i>
+                        <a id="deleteItem-@item.Id" data-target="#myModal-@item.Id" class="trigger-btn" data-toggle="modal" data-whatever="@item.Id"><i class="fa fa-trash"></i></a>
+
+                        <!-- Modal HTML -->
+                        <div id="myModal-@item.Id" class="modal fade">
+                            <div class="modal-dialog modal-confirm">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <div class="icon-box">
+                                            <i class="fas fa-times"></i>
+                                        </div>
+                                        <h4 class="modal-title">Are you sure?</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                                     </div>
-                                    <h4 class="modal-title">Are you sure?</h4>
-                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Do you really want to delete this Expense? This process cannot be undone.</p>
-                                </div>
-                                <div class="modal-footer">
-                                    <form asp-action="DeleteExpenses" method="post">
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        <button type="button" class="btn btn-info" data-dismiss="modal">Cancel</button>
-                                        <input type="submit" value="Delete" class="btn btn-danger" />
-                                    </form>
+                                    <div class="modal-body">
+                                        <p>Do you really want to delete this Expense? This process cannot be undone.</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <form asp-action="DeleteExpenses" method="post">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="button" class="btn btn-info" data-dismiss="modal">Cancel</button>
+                                            <input type="submit" value="Delete" class="btn btn-danger" />
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td></td>
+                <td>
+                    <strong>Total Amount</strong>
                 </td>
+                <td>
+                    @{var total = Model.Sum(x => x.CostOfExpense).ToString("0,0.00"); }
+                    <strong>@("\u20A6")@total</strong>
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
             </tr>
-        }
-        <tr>
-            <td></td>
-            <td>
-                <strong>Total Amount</strong>
-            </td>
-            <td>
-                @{var total = Model.Sum(x => x.CostOfExpense).ToString("0,0.00"); }
-                <strong>@("\u20A6")@total</strong>
-            </td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-    </tbody>
-</table>
-
-
-<a class="btn btn-yellow" asp-action="Index" asp-route-end="@previousEndString" asp-route-timePeriod="@ViewBag.CurrentTimePeriod" asp-route-categoryId="@ViewBag.CategoryId">
-    Previous @cTPeriod
-</a> |
-@if ((DateTime.Now.Date - currentEnd.Date).TotalDays >= 1)
-{
-    <a class="btn btn-yellow" asp-action="Index" asp-route-end="@nextEndString" asp-route-timePeriod="@ViewBag.CurrentTimePeriod" asp-route-categoryId="@ViewBag.CategoryId">
-        Next @cTPeriod
-    </a>@: |
-}
-<a class="btn btn-yellow" asp-action="Index" asp-route-end="@dateTimeNowString" asp-route-timePeriod="@ViewBag.CurrentTimePeriod" asp-route-categoryId="@ViewBag.CategoryId">
-    This @cTPeriod
-</a>
-
-<script type="text/javascript">
-
-        function GetIndex() {
-            var timePeriod = $("#timePeriods").val();
-            var endDate = new Intl.DateTimeFormat('en-GB').format(new Date((@currentEnd.ToString("yyyy/MM/dd"))));
-            $.ajax({
-                type: 'GET',
-                url: '/Expenses/Index',
-                data: { "end": "10/21/2019", "timePeriod": timePeriod },
-                dataType: 'json',
-                success: function (data) {
-                    if (data != null) {
-                        return data;
-                    }
-                }
-            });
-            }
-</script>
-
-@*<div id="progress" style="display:none">
-        <h4>Loading...</h4>
-    </div>*@
-
-@*@section Scripts
+        </tbody>
+    </table>
+</div>
+    @section Scripts
         {
-        <script src="~/lib/jquery/dist/jquery.js"></script>
-
         <script type="text/javascript">
-
-            var pageSize = 10;
-            var pageIndex = 0;
-
+            //$.fn.dataTable.moment("DD/MM/YYYY HH:mm:ss");
+            //$.fn.dataTable.moment("DD/MM/YYYY");
+            //$.fn.dataTable.moment('HH:mm MMM D, YY');
+            //$.fn.dataTable.moment('dddd, MMMM Do, YYYY');
+            //$.fn.dataTable.moment('ll');
             $(document).ready(function () {
-                GetData();
+                $('#myTable').DataTable({
+                    "columnDefs": [{
+                        "targets": 4,
 
-                $(window).scroll(function () {
-                    if ($(window).scrollTop() ==
-                        $(document).height() - $(window).height()) {
-                        GetData();
-                    }
+                        "render": function (data, type, row, meta) {
+                            //debugger
+                            return moment(data, 'DD/MM/YYYY HH:mm:ss A').format('L');
+                        }
+                    }],
+
+                    dom: "Bfrtip",
+                    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    buttons: [
+                        'excel', 'print', 'pdf'
+                    ],
+
+                    "aaSorting": [[4, "desc"]],
+                    //"order": [[4, "desc"]],
+                    "displayLength": 25
                 });
+
+                $('.buttons-copy, .buttons-pdf, .buttons-excel, .buttons-print').removeClass('btn-secondary').addClass('btn-yellow mb-2 mr-md-2').css({ "margin-right": "10px" });
             });
 
-            function GetData() {
-                $.ajax({
-                    type: 'GET',
-                    url: '/Expenses/GetData',
-                    data: { "pageindex": pageIndex, "pagesize": pageSize },
-                    dataType: 'json',
-                    success: function (data) {
-                        if (data != null) {
-                            for (var i = 0; i < data.length; i++) {
-                                let c = i + 1;
-                                if (pageIndex != 0) {
-                                    c = i + (10 * (pageIndex - 1));
-                                }
-                                //var cId = fnCatID(data[i].expenseCategoryId)
-
-                                $("#container").append(
-                                    "<tr>" +
-                                    "<td>" + c + "</td>" +
-                                    "<td>" +
-                                    data[i].nameOfExpense + "</td>" +
-                                    "<td>" +
-                                    new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(data[i].costOfExpense)
-                                    + "</td>");
-                              fnCatID(data[i].expenseCategoryId)
-                                $("#container").append(
-                                    "<tr>" +
-                                        "<td>" +
-                                        new Intl.DateTimeFormat('en-GB').format(new Date(Date.parse((data[i].dateOfExpense))))
-                                        + "</td>" +
-                                        "</tr>");
-                                pageIndex++;
-                            }
-                        }
-                    },
-                    beforeSend: function () {
-                        $("#progress").show();
-                    },
-                    complete: function () {
-                        $("#progress").hide();
-                    },
-                    error: function () {
-                        alert("Error while retrieving data!");
-                    }
-                });
-            }
-
-
-            var fnCatID = function GetCategoryName(catId) {
-                $.ajax({
-                    type: 'GET',
-                    url: '/ExpensesCategory/GetCategory',
-                    data: { "id": catId },
-                    dataType: 'json',
-                    success: function (data) {
-                        $("#container").append(
-                            "<td>" + data + "</td>" );
-                    },
-                    async: false
-                });
-            }
         </script>
-    }*@
+    }

@@ -14,7 +14,7 @@ namespace ExpenseTracker.Biz.IServices
         Budget GetByCategory(int categoryId,string userId, string month, string year);
         bool BudgetExists(Budget budget);
         void AddBudget(Budget Budget);
-        void UpdateBudget(Budget Budget);
+        Budget UpdateBudget(Budget Budget);
         void DeleteBudget(Budget Budget);
 
         Task SendBudgetExceededMail(string userName, string email, string budgetStatus, string category);

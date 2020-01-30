@@ -10,6 +10,7 @@ namespace ExpenseTracker.Biz.IServices
     {
         Dictionary<string, string> CheckBugdetLimit(string userId, int expenseCategoryId,DateTime dateTime);
         Expense GetById(int id);
+        IEnumerable<Expense> GetAllExpenses(string userId);
         IEnumerable<Expense> GetExpensesPerTimePeriod(string userId,int categoryId, string timePeriod, string end);
         DateTime SetTimePeriod(string timePeriod, DateTime endPeriod);
         void AddExpense(Expense expense);

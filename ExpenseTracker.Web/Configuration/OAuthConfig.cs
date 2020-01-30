@@ -7,11 +7,11 @@ namespace ExpenseTracker.Web.Configuration
 {
     public class OAuthConfig
     {
-        public string Name { get; set; }
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-        public string RedirectUri { get; set; }
-        //public Providers[] Providers { get; set; } = new Providers[0];
+        //public string Name { get; set; }
+        //public string ClientId { get; set; }
+        //public string ClientSecret { get; set; }
+        //public string RedirectUri { get; set; }
+        public Providers[] Providers { get; set; } = new Providers[0];
     }
 
     public class Providers

@@ -35,6 +35,7 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
         public IActionResult Create() => View();
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Required]string name)
         {
             if (ModelState.IsValid)
@@ -74,6 +75,7 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(RoleModificationModel model)
         {
             IdentityResult result;
@@ -117,6 +119,7 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string id)
         {
             IdentityRole role = await _roleManager.FindByIdAsync(id);

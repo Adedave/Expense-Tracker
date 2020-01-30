@@ -40,6 +40,7 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
 
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddCategory(string name)
         {
             if (!ModelState.IsValid)
@@ -68,6 +69,7 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateCategory(AdminExpenseCategory category)
         {
             if (category == null || !ModelState.IsValid)

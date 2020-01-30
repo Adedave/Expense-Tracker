@@ -5,11 +5,13 @@ VisualStudioVersion = 15.0.28307.852
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpenseTracker.Web", "ExpenseTracker.Web\ExpenseTracker.Web.csproj", "{0365803F-23CC-4990-823B-F9074F2EAC83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseTracker.Data", "ExpenseTracker.Data\ExpenseTracker.Data.csproj", "{2ED3BF51-6F55-4D18-AADB-07415615B895}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpenseTracker.Data", "ExpenseTracker.Data\ExpenseTracker.Data.csproj", "{2ED3BF51-6F55-4D18-AADB-07415615B895}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseTracker.Common", "ExpenseTracker.Common\ExpenseTracker.Common.csproj", "{C920EEC2-4968-4C37-A7D6-44D132F38E42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpenseTracker.Common", "ExpenseTracker.Common\ExpenseTracker.Common.csproj", "{C920EEC2-4968-4C37-A7D6-44D132F38E42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseTracker.Biz", "ExpenseTracker.Biz\ExpenseTracker.Biz.csproj", "{6A7F58F6-C514-42FF-A44F-0AA27553EFA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpenseTracker.Biz", "ExpenseTracker.Biz\ExpenseTracker.Biz.csproj", "{6A7F58F6-C514-42FF-A44F-0AA27553EFA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpenseTracker.Test", "ExpenseTracker.Test\ExpenseTracker.Test.csproj", "{8D041EDA-BA38-4561-8BEF-DB1DD6B1974C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{6A7F58F6-C514-42FF-A44F-0AA27553EFA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A7F58F6-C514-42FF-A44F-0AA27553EFA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A7F58F6-C514-42FF-A44F-0AA27553EFA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D041EDA-BA38-4561-8BEF-DB1DD6B1974C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D041EDA-BA38-4561-8BEF-DB1DD6B1974C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D041EDA-BA38-4561-8BEF-DB1DD6B1974C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D041EDA-BA38-4561-8BEF-DB1DD6B1974C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

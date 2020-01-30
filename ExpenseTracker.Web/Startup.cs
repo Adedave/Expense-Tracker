@@ -79,11 +79,18 @@ namespace ExpenseTracker.Web
             
             // Automatically perform database migration
             services.BuildServiceProvider().GetService<ExpenseTrackerDbContext>().Database.Migrate();
-            //services.AddAuthentication().AddGoogle(googleOptions =>
-            //{
-            //    googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
-            //    googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
-            //});
+            services.AddAuthentication()
+                .AddGoogle(googleOptions =>
+                {
+                    googleOptions.ClientId = Configuration["OAUTH:providers:0:clientId"];//"797403600411-noggngqnkects487q9kqs4aenahcf7ln.apps.googleusercontent.com";
+                    googleOptions.ClientSecret = Configuration["OAUTH:providers:0:clientSecret"]; //"EEH_GbmWEtf9KhFXHqYZm43s";
+                    //googleOptions.CallbackPath = "/Account/ExternalLoginCallback";
+                })
+                .AddFacebook(facebookOptions =>
+                {
+                    facebookOptions.AppId = Configuration["OAUTH:providers:1:clientId"];
+                    facebookOptions.AppSecret = Configuration["OAUTH:providers:1:clientSecret"];
+                });
 
 
             services.AddMvc(options =>
@@ -91,6 +98,7 @@ namespace ExpenseTracker.Web
                 var policy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser().Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
             })
             .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
@@ -126,6 +134,7 @@ namespace ExpenseTracker.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            //app.UseStatusCodePages();
             app.UseCookiePolicy();
 
             app.UseAuthentication();

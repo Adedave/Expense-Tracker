@@ -14,7 +14,7 @@
     </div>
 }
 <div class="yellow-bg m-1 text-white" style="padding:10px;"><h4>User Accounts</h4></div>
-<a class="btn btn-dark" asp-action="Deactivated" style="float:right;">Deactivated users</a>
+<a class="btn btn-info" asp-action="Deactivated" style="float:right;margin-top:10px;margin-bottom:10px;">Deactivated users</a>
 <br />
 <div class="text-danger" asp-validation-summary="ModelOnly"></div>
 
@@ -50,8 +50,8 @@
                             </button>
 
                         </form>*@
-                    <a class="btn btn-sm btn-yellow" asp-action="Edit" asp-route-id="@user.Id">Edit</a> |
-                    <a id="deleteItem-@user.Id" data-target="#myModal-@user.Id" class="btn btn-sm btn-danger trigger-btn" data-toggle="modal" data-whatever="@user.Id">Deactivate</a>
+                    <a data-toggle="tooltip" data-placement="top" title="Edit" asp-action="Edit" asp-route-id="@user.Id"><i class="fas fa-user-edit"></i></a> |
+                    <a id="deleteItem-@user.Id" data-target="#myModal-@user.Id" class="trigger-btn" data-toggle="modal" data-placement="top" title="Deactivate" data-whatever="@user.Id"><i class="fas fa-user-minus"></i></a>
                     <!-- Modal HTML -->
                     <div id="myModal-@user.Id" class="modal fade">
                         <div class="modal-dialog modal-confirm">
@@ -67,7 +67,7 @@
                                     <p>Do you really want to deactivate this User?</p>
                                 </div>
                                 <div class="modal-footer">
-                                    <form asp-action="Delete" method="post">
+                                    <form asp-action="Deactivate" method="post">
                                         <input type="hidden" name="id" value="@user.Id" />
                                         <button type="button" class="btn btn-info" data-dismiss="modal">Cancel</button>
                                         <input type="submit" value="Deactivate" class="btn btn-danger" />

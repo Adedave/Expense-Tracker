@@ -105,6 +105,7 @@ namespace ExpenseTracker.Web.Controllers
         
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddCategory(string name)
         {
             if (!ModelState.IsValid)
@@ -134,6 +135,7 @@ namespace ExpenseTracker.Web.Controllers
         }
         
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateCategory(ExpenseCategory category)
         {
             if (category == null || !ModelState.IsValid)

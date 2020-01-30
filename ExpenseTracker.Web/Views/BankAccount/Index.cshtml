@@ -70,7 +70,7 @@
                 @value
                 @if (value == "No")
                 {
-                    <a asp-action="GoogleOAuth" asp-controller="Email" asp-route-accountNumber="@item.AccountNumber">Connect here</a>
+                    <a asp-action="GoogleOAuth" asp-controller="Email" asp-route-accountNumber="@item.AccountNumber" asp-route-userId="@item.AppUserId">Connect here</a>
                 }
             </td>
             <td>
