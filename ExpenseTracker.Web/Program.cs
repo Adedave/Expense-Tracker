@@ -19,7 +19,10 @@ namespace ExpenseTracker.Web
             try
             {
                 logger.Debug("init main function");
-                CreateWebHostBuilder(args).Build().Run();
+                CreateWebHostBuilder(args).
+                UseKestrel().
+                UseUrls("http://0.0.0.0:" + Environment.GetEnvironmentVariable("PORT")).
+                Build().Run();
             }
             catch (Exception ex)
             {
