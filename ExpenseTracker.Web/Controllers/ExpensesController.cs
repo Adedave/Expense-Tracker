@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DevExtreme.AspNet.Data;
-using DevExtreme.AspNet.Mvc;
 using ExpenseTracker.Data.Domain.Models;
 using ExpenseTracker.Data;
 using Microsoft.AspNetCore.Authorization;
