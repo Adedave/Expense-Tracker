@@ -15,6 +15,7 @@ using Hangfire;
 using ExpenseTracker.Biz.IServices;
 using System;
 using Microsoft.Extensions.Logging;
+using Hangfire.SQLite;
 
 namespace ExpenseTracker.Web
 {
@@ -48,21 +49,43 @@ namespace ExpenseTracker.Web
 
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
             {
-                    services.AddDbContext<ExpenseTrackerDbContext>(options =>
-                            options.UseSqlServer(Configuration.GetConnectionString("MyDbConnection")));
-                services.AddHangfire(
-                       opt => opt.UseSqlServerStorage(Configuration.GetConnectionString("MyDbConnection"))
-                   );
+                   //services.AddDbContext<ExpenseTrackerDbContext>(options =>
+                //    options.UseSqlServer(
+                //    Configuration["AppSettings:MyDbConnection"]));
+		services.AddDbContext<ExpenseTrackerDbContext>(options =>
+                    options.UseSqlite(Configuration["AppSettings:MyDbConnection"]));
+
+                var sqliteOptions = new SQLiteStorageOptions();
+                services.AddHangfire(configuration => configuration
+                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseRecommendedSerializerSettings()
+                    //.UseMemoryStorage(new MemoryStorageOptions { JobExpirationCheckInterval = TimeSpan.FromMinutes(10) })
+                    .UseSQLiteStorage("Data Source = expensetrackerdb.db;", sqliteOptions)
+                );
+                services.AddHangfireServer();
+			//opt => opt.UseSqlServerStorage(Configuration["AppSettings:MyDbConnection"])
+                    //);
             }
             else
             {
-                services.AddDbContext<ExpenseTrackerDbContext>(options =>
-                    options.UseSqlServer(
-                    Configuration["AppSettings:MyDbConnection"]));
+                //services.AddDbContext<ExpenseTrackerDbContext>(options =>
+                //    options.UseSqlServer(
+                //    Configuration["AppSettings:MyDbConnection"]));
+		services.AddDbContext<ExpenseTrackerDbContext>(options =>
+                    options.UseSqlite(Configuration["AppSettings:MyDbConnection"]));
 
-                services.AddHangfire(
-                        opt => opt.UseSqlServerStorage(Configuration["AppSettings:MyDbConnection"])
-                    );
+                var sqliteOptions = new SQLiteStorageOptions();
+                services.AddHangfire(configuration => configuration
+                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseRecommendedSerializerSettings()
+                    //.UseMemoryStorage(new MemoryStorageOptions { JobExpirationCheckInterval = TimeSpan.FromMinutes(10) })
+                    .UseSQLiteStorage("Data Source = expensetrackerdb.db;", sqliteOptions)
+                );
+                services.AddHangfireServer();
+			//opt => opt.UseSqlServerStorage(Configuration["AppSettings:MyDbConnection"])
+                    //);
             }
 
             services.AddIdentity<AppUser, IdentityRole>(opts =>
