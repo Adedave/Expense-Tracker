@@ -46,14 +46,14 @@ namespace ExpenseTracker.Web
            
             BindAndRegisterConfigurationSettings(Configuration,services);
             DIServicesConfiguration(services);
-
+            //SQLitePCL.raw.SetProvider(new SQLitePCL.isISQLite3Provider);
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
             {
                    //services.AddDbContext<ExpenseTrackerDbContext>(options =>
                 //    options.UseSqlServer(
                 //    Configuration["AppSettings:MyDbConnection"]));
-		services.AddDbContext<ExpenseTrackerDbContext>(options =>
-                    options.UseSqlite(Configuration["AppSettings:MyDbConnection"]));
+		            services.AddDbContext<ExpenseTrackerDbContext>(options =>
+                        options.UseSqlite(Configuration["AppSettings:MyDbConnection"]));
 
                 var sqliteOptions = new SQLiteStorageOptions();
                 services.AddHangfire(configuration => configuration
