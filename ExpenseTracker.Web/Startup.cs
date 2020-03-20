@@ -164,7 +164,8 @@ namespace ExpenseTracker.Web
             //loggerFactory.AddFile("Logs/cyberspace{Date}.txt");
 
             app.UseHangfireDashboard();
-            app.UseHangfireServer();
+            var options = new BackgroundJobServerOptions { WorkerCount = 2 };
+            app.UseHangfireServer(options);
 
 
             RecurringJob.AddOrUpdate<IReminderService>(
