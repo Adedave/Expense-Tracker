@@ -9,6 +9,7 @@ using ExpenseTracker.Data.IRepositories;
 using ExpenseTracker.Common;
 using Microsoft.Extensions.Configuration;
 using ExpenseTracker.Web.Configuration;
+using System;
 
 namespace ExpenseTracker.Web
 {
@@ -16,16 +17,33 @@ namespace ExpenseTracker.Web
     {
         private void BindAndRegisterConfigurationSettings(IConfiguration configuration, IServiceCollection services)
         {
-            var emailSettings = new EmailSettings();
-            Configuration.Bind("EmailSettings", emailSettings);
+            var sendgridKey = Environment.GetEnvironmentVariable("SENDGRID_KEY");
+            var sendgridFromAddress = Environment.GetEnvironmentVariable("SENDGRID_EMAILADDRESS");
+            var gClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENTID");
+            var gClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENTSECRET");
+            var redirectUri = Environment.GetEnvironmentVariable("redirectUri");
+
+            var emailSettings = new EmailSettings
+            {
+                SendGridKey = sendgridKey,
+                FromEmailAddress = sendgridFromAddress
+            };
+            
             services.AddSingleton<IEmailSettings>(emailSettings);
-
-            var appSettings = new AppSettings();
-            Configuration.Bind("AppSettings", appSettings);
-            services.AddSingleton(appSettings);
-
-            var oAuthConfig = new OAuthConfig();
-            Configuration.Bind("OAUTH", oAuthConfig);
+            
+            var oAuthConfig = new OAuthConfig
+            {
+                Providers = new Providers[]
+                {
+                    new Providers
+                    {
+                        ClientId = gClientId,
+                        ClientSecret = gClientSecret,
+                        Name = "Google",
+                        RedirectUri = redirectUri
+                    }
+                }
+            };
             services.AddSingleton(oAuthConfig);
         }
 
