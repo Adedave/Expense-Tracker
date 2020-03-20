@@ -13,14 +13,14 @@ namespace ExpenseTracker.Web
     {
         public static async Task CreateAdminAccount(IServiceProvider serviceProvider, IConfiguration configuration)
         {
+            var email = Environment.GetEnvironmentVariable("SUPERADMIN_EMAIL");
+            var password = Environment.GetEnvironmentVariable("SUPERADMIN_PASSWORD");
             UserManager<AppUser> userManager =
             serviceProvider.GetRequiredService<UserManager<AppUser>>();
             RoleManager<IdentityRole> roleManager =
             serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            string username = configuration["Data:AdminUser:Name"];
-            string email = configuration["Data:AdminUser:Email"];
-            string password = configuration["Data:AdminUser:Password"];
-            string role = configuration["Data:AdminUser:Role"];
+            string username = "Admin";
+            string role = "Admin";
 
             if (await userManager.FindByNameAsync(username) == null)
             {
