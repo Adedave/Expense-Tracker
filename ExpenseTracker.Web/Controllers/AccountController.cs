@@ -228,7 +228,8 @@ namespace ExpenseTracker.Web.Controllers
             if (ModelState.IsValid)
             {
                 AppUser user = await _userManager.FindByEmailAsync(details.Email);
-                if (!user.EmailConfirmed && user.IsActive == true)
+
+                if (user != null && !user.EmailConfirmed && user.IsActive == true)
                 {
                     //return RedirectToAction("Activate", new { email = user.Email });
                     ViewBag.NotVerified =  "You have not yet verified your account. Please check your mailbox for instructions on verifying your registration in order to log in";
