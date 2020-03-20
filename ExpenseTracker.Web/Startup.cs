@@ -69,6 +69,8 @@ namespace ExpenseTracker.Web
                 var dbName = Environment.GetEnvironmentVariable("DATABASE_NAME");
                 var gClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENTID");
                 var gClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENTSECRET");
+                var fClientId = Environment.GetEnvironmentVariable("FACEBOOK_CLIENTID");
+                var fClientSecret = Environment.GetEnvironmentVariable("FACEBOOK_CLIENTSECRET");
                 int.TryParse(Configuration["PostgreSql:Port"], out int port);
 
                 var builder = new NpgsqlConnectionStringBuilder()
@@ -93,8 +95,8 @@ namespace ExpenseTracker.Web
                 })
                 .AddFacebook(facebookOptions =>
                 {
-                    facebookOptions.AppId = Configuration["OAUTH:providers:1:clientId"];
-                    facebookOptions.AppSecret = Configuration["OAUTH:providers:1:clientSecret"];
+                    facebookOptions.AppId = fClientId;
+                    facebookOptions.AppSecret = fClientSecret;
                 });
 
             }
