@@ -64,16 +64,17 @@ namespace ExpenseTracker.Web
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
             {
                 var dbPassword = Environment.GetEnvironmentVariable("DATABASE_PASSWORD");
-                var dbUri = Environment.GetEnvironmentVariable("DATABASE_URL");
+                var dbHost = Environment.GetEnvironmentVariable("DATABASE_HOST");
                 var dbUsername = Environment.GetEnvironmentVariable("DATABASE_USERNAME");
+                var dbName = Environment.GetEnvironmentVariable("DATABASE_NAME");
                 int.TryParse(Configuration["PostgreSql:Port"], out int port);
 
                 var builder = new NpgsqlConnectionStringBuilder()
                 {
-                    Host = dbUri,
+                    Host = dbHost,
                     Password = dbPassword,
                     Username = dbUsername,
-                    Database = Configuration["PostgreSql:Database"],
+                    Database = dbName,
                     Port = port
                 };
 
