@@ -67,6 +67,8 @@ namespace ExpenseTracker.Web
                 var dbHost = Environment.GetEnvironmentVariable("DATABASE_HOST");
                 var dbUsername = Environment.GetEnvironmentVariable("DATABASE_USERNAME");
                 var dbName = Environment.GetEnvironmentVariable("DATABASE_NAME");
+                var gClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENTID");
+                var gClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENTSECRET");
                 int.TryParse(Configuration["PostgreSql:Port"], out int port);
 
                 var builder = new NpgsqlConnectionStringBuilder()
@@ -82,6 +84,19 @@ namespace ExpenseTracker.Web
 
                 services.AddHangfire(x => x.UsePostgreSqlStorage(builder.ConnectionString));
 
+                services.AddAuthentication()
+                .AddGoogle(googleOptions =>
+                {
+                    googleOptions.ClientId = gClientId;
+                    googleOptions.ClientSecret = gClientSecret;
+                    //googleOptions.CallbackPath = "/Account/ExternalLoginCallback";
+                })
+                .AddFacebook(facebookOptions =>
+                {
+                    facebookOptions.AppId = Configuration["OAUTH:providers:1:clientId"];
+                    facebookOptions.AppSecret = Configuration["OAUTH:providers:1:clientSecret"];
+                });
+
             }
             else
             {
@@ -96,17 +111,12 @@ namespace ExpenseTracker.Web
                 services.AddDbContext<ExpenseTrackerDbContext>(options => options.UseNpgsql(builder.ConnectionString));
 
                 services.AddHangfire(x => x.UsePostgreSqlStorage(builder.ConnectionString));
-            }
 
-            
-            
-            // Automatically perform database migration
-            services.BuildServiceProvider().GetService<ExpenseTrackerDbContext>().Database.Migrate();
-            services.AddAuthentication()
+                services.AddAuthentication()
                 .AddGoogle(googleOptions =>
                 {
-                    googleOptions.ClientId = Configuration["OAUTH:providers:0:clientId"];//"797403600411-noggngqnkects487q9kqs4aenahcf7ln.apps.googleusercontent.com";
-                    googleOptions.ClientSecret = Configuration["OAUTH:providers:0:clientSecret"]; //"EEH_GbmWEtf9KhFXHqYZm43s";
+                    googleOptions.ClientId = Configuration["OAUTH:providers:0:clientId"];
+                    googleOptions.ClientSecret = Configuration["OAUTH:providers:0:clientSecret"];
                     //googleOptions.CallbackPath = "/Account/ExternalLoginCallback";
                 })
                 .AddFacebook(facebookOptions =>
@@ -114,6 +124,13 @@ namespace ExpenseTracker.Web
                     facebookOptions.AppId = Configuration["OAUTH:providers:1:clientId"];
                     facebookOptions.AppSecret = Configuration["OAUTH:providers:1:clientSecret"];
                 });
+            }
+
+            
+            
+            // Automatically perform database migration
+            services.BuildServiceProvider().GetService<ExpenseTrackerDbContext>().Database.Migrate();
+            
 
 
             services.AddMvc(options =>

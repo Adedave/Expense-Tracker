@@ -17,34 +17,47 @@ namespace ExpenseTracker.Web
     {
         private void BindAndRegisterConfigurationSettings(IConfiguration configuration, IServiceCollection services)
         {
-            var sendgridKey = Environment.GetEnvironmentVariable("SENDGRID_KEY");
-            var sendgridFromAddress = Environment.GetEnvironmentVariable("SENDGRID_EMAILADDRESS");
-            var gClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENTID");
-            var gClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENTSECRET");
-            var redirectUri = Environment.GetEnvironmentVariable("redirectUri");
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+            {
+                var sendgridKey = Environment.GetEnvironmentVariable("SENDGRID_KEY");
+                var sendgridFromAddress = Environment.GetEnvironmentVariable("SENDGRID_EMAILADDRESS");
+                var gClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENTID");
+                var gClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENTSECRET");
+                var redirectUri = Environment.GetEnvironmentVariable("redirectUri");
 
-            var emailSettings = new EmailSettings
-            {
-                SendGridKey = sendgridKey,
-                FromEmailAddress = sendgridFromAddress
-            };
-            
-            services.AddSingleton<IEmailSettings>(emailSettings);
-            
-            var oAuthConfig = new OAuthConfig
-            {
-                Providers = new Providers[]
+                var oAuthConfig = new OAuthConfig
                 {
-                    new Providers
+                    Providers = new Providers[]
                     {
-                        ClientId = gClientId,
-                        ClientSecret = gClientSecret,
-                        Name = "Google",
-                        RedirectUri = redirectUri
+                        new Providers
+                        {
+                            ClientId = gClientId,
+                            ClientSecret = gClientSecret,
+                            Name = "Google",
+                            RedirectUri = redirectUri
+                        }
                     }
-                }
-            };
-            services.AddSingleton(oAuthConfig);
+                };
+                services.AddSingleton(oAuthConfig);
+
+                var emailSettings = new EmailSettings
+                {
+                    SendGridKey = sendgridKey,
+                    FromEmailAddress = sendgridFromAddress
+                };
+                services.AddSingleton<IEmailSettings>(emailSettings);
+            }
+            else if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                var emailSettings = new EmailSettings();
+                Configuration.Bind("EmailSettings", emailSettings);
+                services.AddSingleton<IEmailSettings>(emailSettings);
+
+                var oAuthConfig = new OAuthConfig();
+                Configuration.Bind("OAUTH", oAuthConfig);
+                services.AddSingleton(oAuthConfig);
+            }
+            
         }
 
         public void DIServicesConfiguration(IServiceCollection services)
