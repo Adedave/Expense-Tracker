@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.ComponentModel.DataAnnotations;
 
 namespace ExpenseTracker.Data.Domain.Models
 {
     public class ExpenseCategory
     {
+        [Key]
         public int Id { get; set; }
+        [Required]
         public string Name { get; set; }
 
         public DateTime DateCreated { get; set; }

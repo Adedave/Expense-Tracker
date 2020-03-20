@@ -16,6 +16,8 @@ using ExpenseTracker.Biz.IServices;
 using System;
 using Microsoft.Extensions.Logging;
 using Hangfire.SQLite;
+using Npgsql;
+using Hangfire.PostgreSql;
 
 namespace ExpenseTracker.Web
 {
@@ -46,47 +48,6 @@ namespace ExpenseTracker.Web
            
             BindAndRegisterConfigurationSettings(Configuration,services);
             DIServicesConfiguration(services);
-            //SQLitePCL.raw.SetProvider(new SQLitePCL.isISQLite3Provider);
-            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
-            {
-                   //services.AddDbContext<ExpenseTrackerDbContext>(options =>
-                //    options.UseSqlServer(
-                //    Configuration["AppSettings:MyDbConnection"]));
-		            services.AddDbContext<ExpenseTrackerDbContext>(options =>
-                        options.UseSqlite(Configuration["AppSettings:MyDbConnection"]));
-
-                var sqliteOptions = new SQLiteStorageOptions();
-                services.AddHangfire(configuration => configuration
-                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                    .UseSimpleAssemblyNameTypeSerializer()
-                    .UseRecommendedSerializerSettings()
-                    //.UseMemoryStorage(new MemoryStorageOptions { JobExpirationCheckInterval = TimeSpan.FromMinutes(10) })
-                    .UseSQLiteStorage("Data Source = expensetrackerdb.db;", sqliteOptions)
-                );
-                services.AddHangfireServer();
-			//opt => opt.UseSqlServerStorage(Configuration["AppSettings:MyDbConnection"])
-                    //);
-            }
-            else
-            {
-                //services.AddDbContext<ExpenseTrackerDbContext>(options =>
-                //    options.UseSqlServer(
-                //    Configuration["AppSettings:MyDbConnection"]));
-		services.AddDbContext<ExpenseTrackerDbContext>(options =>
-                    options.UseSqlite(Configuration["AppSettings:MyDbConnection"]));
-
-                var sqliteOptions = new SQLiteStorageOptions();
-                services.AddHangfire(configuration => configuration
-                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                    .UseSimpleAssemblyNameTypeSerializer()
-                    .UseRecommendedSerializerSettings()
-                    //.UseMemoryStorage(new MemoryStorageOptions { JobExpirationCheckInterval = TimeSpan.FromMinutes(10) })
-                    .UseSQLiteStorage("Data Source = expensetrackerdb.db;", sqliteOptions)
-                );
-                services.AddHangfireServer();
-			//opt => opt.UseSqlServerStorage(Configuration["AppSettings:MyDbConnection"])
-                    //);
-            }
 
             services.AddIdentity<AppUser, IdentityRole>(opts =>
             {
@@ -99,6 +60,44 @@ namespace ExpenseTracker.Web
                 opts.Password.RequireDigit = false;
             }).AddEntityFrameworkStores<ExpenseTrackerDbContext>()
                  .AddDefaultTokenProviders();
+
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+            {
+                var dbPassword = Environment.GetEnvironmentVariable("DATABASE_PASSWORD");
+                var dbUri = Environment.GetEnvironmentVariable("DATABASE_URL");
+                var dbUsername = Environment.GetEnvironmentVariable("DATABASE_USERNAME");
+                int.TryParse(Configuration["PostgreSql:Port"], out int port);
+
+                var builder = new NpgsqlConnectionStringBuilder()
+                {
+                    Host = dbUri,
+                    Password = dbPassword,
+                    Username = dbUsername,
+                    Database = Configuration["PostgreSql:Database"],
+                    Port = port
+                };
+
+                services.AddDbContext<ExpenseTrackerDbContext>(options => options.UseNpgsql(builder.ConnectionString));
+
+                services.AddHangfire(x => x.UsePostgreSqlStorage(builder.ConnectionString));
+
+            }
+            else
+            {
+                var connectionString = Configuration["PostgreSql:ConnectionString"];
+                var dbPassword = Configuration["PostgreSql:DbPassword"];
+
+                var builder = new NpgsqlConnectionStringBuilder(connectionString)
+                {
+                    Password = dbPassword
+                };
+
+                services.AddDbContext<ExpenseTrackerDbContext>(options => options.UseNpgsql(builder.ConnectionString));
+
+                services.AddHangfire(x => x.UsePostgreSqlStorage(builder.ConnectionString));
+            }
+
+            
             
             // Automatically perform database migration
             services.BuildServiceProvider().GetService<ExpenseTrackerDbContext>().Database.Migrate();

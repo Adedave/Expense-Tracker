@@ -3,25 +3,43 @@ using System;
 using ExpenseTracker.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace ExpenseTracker.Data.Migrations
 {
     [DbContext(typeof(ExpenseTrackerDbContext))]
-    [Migration("20190923123828_MoreDbSets")]
-    partial class MoreDbSets
+    [Migration("20200320131125_postgresql")]
+    partial class postgresql
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)
                 .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.AppUser", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.AdminExpenseCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("AppUserId");
+
+                    b.Property<DateTime>("DateCreated");
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppUserId");
+
+                    b.ToTable("AdminExpenseCategories");
+                });
+
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.AppUser", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -35,6 +53,12 @@ namespace ExpenseTracker.Data.Migrations
                         .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed");
+
+                    b.Property<string>("FirstName");
+
+                    b.Property<bool>("IsActive");
+
+                    b.Property<string>("LastName");
 
                     b.Property<bool>("LockoutEnabled");
 
@@ -66,40 +90,67 @@ namespace ExpenseTracker.Data.Migrations
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+                        .HasName("UserNameIndex");
 
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.BankAccount", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.Bank", b =>
+                {
+                    b.Property<int>("BankId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("AlertEmail");
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("BankId");
+
+                    b.ToTable("Banks");
+                });
+
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.BankAccount", b =>
                 {
                     b.Property<int>("BankAccountId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("AboutToConnect");
 
                     b.Property<string>("AccountNumber");
 
                     b.Property<string>("AlertEmail");
 
+                    b.Property<string>("AppUserId");
+
                     b.Property<string>("BankName");
 
+                    b.Property<int?>("GoogleAuthId");
+
+                    b.Property<bool>("IsConnnected");
+
                     b.HasKey("BankAccountId");
+
+                    b.HasIndex("AppUserId");
+
+                    b.HasIndex("GoogleAuthId");
 
                     b.ToTable("BankAccounts");
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.BankTransaction", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.BankTransaction", b =>
                 {
                     b.Property<int>("BankTransactionId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("AccountNumber");
 
                     b.Property<string>("AppUserId");
 
                     b.Property<string>("Description");
+
+                    b.Property<bool>("IsDeleted");
+
+                    b.Property<bool>("IsRecorded");
 
                     b.Property<string>("Remarks");
 
@@ -110,6 +161,8 @@ namespace ExpenseTracker.Data.Migrations
 
                     b.Property<DateTime>("TransactionDate");
 
+                    b.Property<string>("TransactionType");
+
                     b.HasKey("BankTransactionId");
 
                     b.HasIndex("AppUserId");
@@ -117,18 +170,17 @@ namespace ExpenseTracker.Data.Migrations
                     b.ToTable("BankTransactions");
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.Budget", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.Budget", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(13,4)");
 
                     b.Property<string>("AppUserId");
 
-                    b.Property<int>("IncomeCategoryId");
+                    b.Property<int>("ExpenseCategoryId");
 
                     b.Property<string>("Month");
 
@@ -138,16 +190,15 @@ namespace ExpenseTracker.Data.Migrations
 
                     b.HasIndex("AppUserId");
 
-                    b.HasIndex("IncomeCategoryId");
+                    b.HasIndex("ExpenseCategoryId");
 
                     b.ToTable("Budgets");
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.Expense", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.Expense", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("AppUserId");
 
@@ -171,17 +222,17 @@ namespace ExpenseTracker.Data.Migrations
                     b.ToTable("Expenses");
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.ExpenseCategory", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.ExpenseCategory", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("AppUserId");
 
                     b.Property<DateTime>("DateCreated");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.HasKey("Id");
 
@@ -190,11 +241,44 @@ namespace ExpenseTracker.Data.Migrations
                     b.ToTable("ExpenseCategories");
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.Income", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.GoogleAuth", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("AccessToken");
+
+                    b.Property<string>("AccountNumber");
+
+                    b.Property<string>("AppUserId");
+
+                    b.Property<string>("Email");
+
+                    b.Property<long?>("ExpiresInSeconds");
+
+                    b.Property<string>("IdToken");
+
+                    b.Property<DateTime>("IssuedUtc");
+
+                    b.Property<long>("LargestUID");
+
+                    b.Property<string>("RefreshToken");
+
+                    b.Property<string>("Scope");
+
+                    b.Property<string>("TokenType");
+
+                    b.Property<long>("UIDValidity");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GoogleAuths");
+                });
+
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.Income", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(13,4)");
@@ -218,11 +302,10 @@ namespace ExpenseTracker.Data.Migrations
                     b.ToTable("Incomes");
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.IncomeCategory", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.IncomeCategory", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("AppUserId");
 
@@ -237,13 +320,14 @@ namespace ExpenseTracker.Data.Migrations
                     b.ToTable("IncomeCategories");
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.Reminder", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.Reminder", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("AppUserId");
+
+                    b.Property<string>("ReminderInterval");
 
                     b.Property<string>("ReminderMessage");
 
@@ -274,8 +358,7 @@ namespace ExpenseTracker.Data.Migrations
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasName("RoleNameIndex")
-                        .HasFilter("\"NormalizedName\" IS NOT NULL");
+                        .HasName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles");
                 });
@@ -283,8 +366,7 @@ namespace ExpenseTracker.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("ClaimType");
 
@@ -303,8 +385,7 @@ namespace ExpenseTracker.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("ClaimType");
 
@@ -366,66 +447,84 @@ namespace ExpenseTracker.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.BankTransaction", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.AdminExpenseCategory", b =>
                 {
-                    b.HasOne("ExpenseTracker.Biz.Domain.Models.AppUser", "AppUser")
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.AppUser", "AppUser")
                         .WithMany()
                         .HasForeignKey("AppUserId");
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.Budget", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.BankAccount", b =>
                 {
-                    b.HasOne("ExpenseTracker.Biz.Domain.Models.AppUser", "AppUser")
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.AppUser", "AppUser")
                         .WithMany()
                         .HasForeignKey("AppUserId");
 
-                    b.HasOne("ExpenseTracker.Biz.Domain.Models.IncomeCategory", "Category")
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.GoogleAuth", "GoogleAuth")
                         .WithMany()
-                        .HasForeignKey("IncomeCategoryId")
+                        .HasForeignKey("GoogleAuthId");
+                });
+
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.BankTransaction", b =>
+                {
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId");
+                });
+
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.Budget", b =>
+                {
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.AppUser", "AppUser")
+                        .WithMany()
+                        .HasForeignKey("AppUserId");
+
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.ExpenseCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("ExpenseCategoryId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.Expense", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.Expense", b =>
                 {
-                    b.HasOne("ExpenseTracker.Biz.Domain.Models.AppUser", "AppUser")
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.AppUser", "AppUser")
                         .WithMany()
                         .HasForeignKey("AppUserId");
 
-                    b.HasOne("ExpenseTracker.Biz.Domain.Models.ExpenseCategory", "ExpenseCategory")
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.ExpenseCategory", "ExpenseCategory")
                         .WithMany("Expenses")
                         .HasForeignKey("ExpenseCategoryId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.ExpenseCategory", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.ExpenseCategory", b =>
                 {
-                    b.HasOne("ExpenseTracker.Biz.Domain.Models.AppUser", "AppUser")
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.AppUser", "AppUser")
                         .WithMany()
                         .HasForeignKey("AppUserId");
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.Income", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.Income", b =>
                 {
-                    b.HasOne("ExpenseTracker.Biz.Domain.Models.AppUser", "AppUser")
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.AppUser", "AppUser")
                         .WithMany()
                         .HasForeignKey("AppUserId");
 
-                    b.HasOne("ExpenseTracker.Biz.Domain.Models.IncomeCategory", "Category")
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.IncomeCategory", "Category")
                         .WithMany("Incomes")
                         .HasForeignKey("IncomeCategoryId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.IncomeCategory", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.IncomeCategory", b =>
                 {
-                    b.HasOne("ExpenseTracker.Biz.Domain.Models.AppUser", "AppUser")
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.AppUser", "AppUser")
                         .WithMany()
                         .HasForeignKey("AppUserId");
                 });
 
-            modelBuilder.Entity("ExpenseTracker.Biz.Domain.Models.Reminder", b =>
+            modelBuilder.Entity("ExpenseTracker.Data.Domain.Models.Reminder", b =>
                 {
-                    b.HasOne("ExpenseTracker.Biz.Domain.Models.AppUser", "AppUser")
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.AppUser", "AppUser")
                         .WithMany()
                         .HasForeignKey("AppUserId");
                 });
@@ -440,7 +539,7 @@ namespace ExpenseTracker.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("ExpenseTracker.Biz.Domain.Models.AppUser")
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.AppUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -448,7 +547,7 @@ namespace ExpenseTracker.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("ExpenseTracker.Biz.Domain.Models.AppUser")
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.AppUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -461,7 +560,7 @@ namespace ExpenseTracker.Data.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("ExpenseTracker.Biz.Domain.Models.AppUser")
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.AppUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -469,7 +568,7 @@ namespace ExpenseTracker.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("ExpenseTracker.Biz.Domain.Models.AppUser")
+                    b.HasOne("ExpenseTracker.Data.Domain.Models.AppUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
