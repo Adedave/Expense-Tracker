@@ -20,4 +20,5 @@ RUN dotnet publish "ExpenseTracker.Web.csproj" -c Release -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
+ENV ASPNETCORE_ENVIRONMENT Production
 CMD ASPNETCORE_URLS=http://*:$PORT dotnet ExpenseTracker.Web.dll
