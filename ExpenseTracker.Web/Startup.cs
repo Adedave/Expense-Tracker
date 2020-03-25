@@ -18,6 +18,7 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using Hangfire.PostgreSql;
 using System.Threading.Tasks;
+using ExpenseTracker.Biz.Infrastructure;
 
 namespace ExpenseTracker.Web
 {
@@ -174,8 +175,12 @@ namespace ExpenseTracker.Web
             }
 
             //loggerFactory.AddFile("Logs/cyberspace{Date}.txt");
-
-            app.UseHangfireDashboard();
+            
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new HangfireAuthorizationFilter() },
+                //Back to site app url
+            });
             var options = new BackgroundJobServerOptions { WorkerCount = 2 };
             app.UseHangfireServer(options);
 

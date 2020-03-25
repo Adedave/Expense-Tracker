@@ -19,4 +19,8 @@
     <ProjectReference Include="..\ExpenseTracker.Data\ExpenseTracker.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+  </ItemGroup>
+
 </Project>
