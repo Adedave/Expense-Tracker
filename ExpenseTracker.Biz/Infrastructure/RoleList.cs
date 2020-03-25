@@ -25,7 +25,7 @@ namespace ExpenseTracker.Biz.Infrastructure
         }
 
         public const string SuperAdmin = "SuperAdmin";
-        public const string Admin = "Admin";
-        public const string User = "User";
+        public const string Admins = "Admins";
+        public const string Users = "Users";
     }
 }

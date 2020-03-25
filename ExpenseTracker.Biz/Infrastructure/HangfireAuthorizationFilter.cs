@@ -18,7 +18,7 @@ namespace ExpenseTracker.Biz.Infrastructure
             var httpContext = context.GetHttpContext();
 
             // Allow only SuperAdmin authenticated users to see the Dashboard.
-            var IsAuthorized = httpContext.User.IsInRole(RolesList.SuperAdmin);
+            var IsAuthorized = httpContext.User.IsInRole(RolesList.Admins);
             //logger.LogInformation($"-------- {httpContext.User.ToString()} --------");
             //logger.LogInformation($"-------- ISAuthorized: {IsAuthorized} --------");
             return IsAuthorized;
