@@ -17,6 +17,7 @@ using System;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using Hangfire.PostgreSql;
+using System.Threading.Tasks;
 
 namespace ExpenseTracker.Web
 {
@@ -118,6 +119,18 @@ namespace ExpenseTracker.Web
                 {
                     googleOptions.ClientId = Configuration["OAUTH:providers:0:clientId"];
                     googleOptions.ClientSecret = Configuration["OAUTH:providers:0:clientSecret"];
+                    googleOptions.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents
+                    {
+                        OnRedirectToAuthorizationEndpoint = redirectContext =>
+                        {
+                            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development")
+                            {
+                                //Force scheme of redirect URI (THE IMPORTANT PART)
+                                redirectContext.RedirectUri = redirectContext.RedirectUri.Replace("http://", "https://", StringComparison.OrdinalIgnoreCase);
+                            }
+                            return Task.FromResult(0);
+                        }
+                    };
                     //googleOptions.CallbackPath = "/Account/ExternalLoginCallback";
                 })
                 .AddFacebook(facebookOptions =>
