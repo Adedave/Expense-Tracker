@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ExpenseTracker.Biz.Services
@@ -20,8 +19,11 @@ namespace ExpenseTracker.Biz.Services
         private readonly IEmailService _emailService;
         private readonly IViewRenderService _viewRenderService;
 
-        public ReminderService(IReminderRepository reminderRepository, UserManager<AppUser> userManager,
-            IEmailService emailService, IViewRenderService viewRenderService)
+        public ReminderService(
+            IReminderRepository reminderRepository,
+            UserManager<AppUser> userManager,
+            IEmailService emailService, 
+            IViewRenderService viewRenderService)
         {
             _reminderRepository = reminderRepository;
             _userManager = userManager;

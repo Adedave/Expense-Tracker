@@ -11,5 +11,6 @@ namespace ExpenseTracker.Common
         Task<bool> BudgetExceeded(string recipient, string message, string category);
         Task<bool> SendMonthlyReport(string recipient, string message, DateTime month);
         Task<bool> TestEmail(string recipient, string message);
+        Task<bool> SendMessage(string subject, string message, string recipient);
     }
 }

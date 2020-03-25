@@ -3,18 +3,28 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ExpenseTracker.Web
 {
     public class CreateAdmin
     {
-        public static async Task CreateAdminAccount(IServiceProvider serviceProvider, IConfiguration configuration)
+        public static async Task CreateAdminAccount(
+            IServiceProvider serviceProvider, IConfiguration configuration)
         {
-            var email = Environment.GetEnvironmentVariable("SUPERADMIN_EMAIL");
-            var password = Environment.GetEnvironmentVariable("SUPERADMIN_PASSWORD");
+            string email = "", password = "";
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Production")
+            {
+                 email = Environment.GetEnvironmentVariable("SUPERADMIN_EMAIL");
+                password = Environment.GetEnvironmentVariable("SUPERADMIN_PASSWORD");
+
+            }
+            else if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                
+                email = configuration["Data:AdminUser:Email"];
+                password = configuration["Data:AdminUser:Password"];
+            }
             UserManager<AppUser> userManager =
             serviceProvider.GetRequiredService<UserManager<AppUser>>();
             RoleManager<IdentityRole> roleManager =

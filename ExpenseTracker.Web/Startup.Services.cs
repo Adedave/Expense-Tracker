@@ -91,6 +91,7 @@ namespace ExpenseTracker.Web
             services.AddTransient<IEmailService, EmailService>();
 
             services.AddTransient<IViewRenderService, ViewRenderService>();
+            services.AddTransient<IUserService, UserService>();
         }
     }
 }

@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using DevExtreme.AspNet.Data;
 using ExpenseTracker.Data.Domain.Models;
-using ExpenseTracker.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ExpenseTracker.Biz.Services;
 using ExpenseTracker.Biz.IServices;
-using DevExtreme.AspNet.Data.ResponseModel;
 using ExpenseTracker.Common;
 using Hangfire;
 
@@ -31,8 +25,11 @@ namespace ExpenseTracker.Web.Controllers
         private readonly IEmailService _emailService;
         private readonly IExpenseCategoryService _expenseCategoryService;
 
-        public ExpensesController(IExpenseService expenseService, IViewRenderService viewRenderService,
-            IBudgetService budgetService, IEmailService emailService,
+        public ExpensesController(
+            IExpenseService expenseService,
+            IViewRenderService viewRenderService,
+            IBudgetService budgetService,
+            IEmailService emailService,
             IExpenseCategoryService expenseCategoryService,
             UserManager<AppUser> userManager)
         {
@@ -149,8 +146,6 @@ namespace ExpenseTracker.Web.Controllers
                 AppUserId = user.Id
             };
 
-            ViewBag.CategoryList = _expenseCategoryService.GetCategories(user.Id);
-
             return View(expenses);
         }
 
@@ -212,8 +207,6 @@ namespace ExpenseTracker.Web.Controllers
          {
             var user = await GetCurrentUser();
 
-            ViewBag.CategoryList = _expenseCategoryService.GetCategories(user.Id);
-
             if (!ModelState.IsValid)
             {
                 ModelState.AddModelError("", "Incomplete Form! Kindly complete the required fields");
@@ -224,6 +217,7 @@ namespace ExpenseTracker.Web.Controllers
             
             //check if expenses have exceeded budget
             _expenseService.AddExpense(expenses);
+
             Dictionary<string, string> budgetMessage = CheckBudgetLimit(user, expenses);
             if (budgetMessage["IsBudgetBelowExpense"] == "false" )
             {

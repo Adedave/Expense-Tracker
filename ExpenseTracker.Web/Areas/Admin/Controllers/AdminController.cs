@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ExpenseTracker.Data.Domain.Models;
 using ExpenseTracker.Web.Models;
-using Microsoft.EntityFrameworkCore;
 using Hangfire;
 using ExpenseTracker.Biz.IServices;
 using ExpenseTracker.Common;
@@ -102,7 +99,7 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
                 if (result.Succeeded)
                 {
                     TempData["Message"] = $"User \"{model.Name}\" was created successfully!";
-                    await AddUserToUsersRoleAsync(user.Email);
+                    await AddUserToRoleAsync(user.Email, "Users");
 
                     string cTokenLink = await GenerateEmailTokenAsync(user.Email);
 
@@ -143,12 +140,12 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
                 () => emailService.ConfirmEmail(appUser.Email, message));
         }
 
-        private async Task AddUserToUsersRoleAsync(string userEmail)
+        private async Task AddUserToRoleAsync(string userEmail, string role)
         {
             AppUser registeredUser = await _userManager.FindByEmailAsync(userEmail);
             if (registeredUser != null)
             {
-                IdentityResult result = await _userManager.AddToRoleAsync(registeredUser, "Users");
+                IdentityResult result = await _userManager.AddToRoleAsync(registeredUser, role);
 
                 if (!result.Succeeded)
                 {

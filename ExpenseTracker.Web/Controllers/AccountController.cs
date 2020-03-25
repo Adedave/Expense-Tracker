@@ -7,7 +7,6 @@ using ExpenseTracker.Data.Domain.Models;
 using ExpenseTracker.Web.Models;
 using ExpenseTracker.Common;
 using ExpenseTracker.Biz.IServices;
-using System;
 using Hangfire;
 using System.Linq;
 using ExpenseTracker.Web.Configuration;
@@ -21,18 +20,24 @@ namespace ExpenseTracker.Web.Controllers
         private UserManager<AppUser> _userManager;
         private readonly IEmailService _emailService;
         private readonly OAuthConfig _oAuthConfig;
+        private readonly IUserService userService;
         private SignInManager<AppUser> _signInManager;
         private readonly IViewRenderService _viewRenderService;
 
-        public AccountController(UserManager<AppUser> userMgr, IEmailService emailService,
-        SignInManager<AppUser> signinMgr, IViewRenderService viewRenderService,
-        OAuthConfig oAuthConfig)
+        public AccountController(
+            UserManager<AppUser> userMgr,
+            IEmailService emailService,
+            SignInManager<AppUser> signinMgr,
+            IViewRenderService viewRenderService,
+            OAuthConfig oAuthConfig,
+            IUserService userService)
         {
             _userManager = userMgr;
             _emailService = emailService;
             _signInManager = signinMgr;
             _viewRenderService = viewRenderService;
             _oAuthConfig = oAuthConfig;
+            this.userService = userService;
         }
 
         [AllowAnonymous]
@@ -96,7 +101,7 @@ namespace ExpenseTracker.Web.Controllers
                 if (result.Succeeded)
                 {
 
-                    await AddUserToUsersRoleAsync(user.Email);
+                    await AddUserToRoleAsync(user.Email, "Users");
 
                     string cTokenLink = await GenerateEmailTokenAsync(user.Email);
 
@@ -122,12 +127,12 @@ namespace ExpenseTracker.Web.Controllers
             ViewBag.Email = appUser!=null ? email : "<Email Not Found>";
             return View();
         }
-        private async Task AddUserToUsersRoleAsync(string userEmail)
+        private async Task AddUserToRoleAsync(string userEmail, string role)
         {
             AppUser registeredUser = await _userManager.FindByEmailAsync(userEmail);
             if (registeredUser != null)
             {
-                IdentityResult result = await _userManager.AddToRoleAsync(registeredUser, "Users");
+                IdentityResult result = await _userManager.AddToRoleAsync(registeredUser, role);
 
                 if (!result.Succeeded)
                 {
@@ -355,7 +360,7 @@ namespace ExpenseTracker.Web.Controllers
                     IdentityResult identityResult = await _userManager.CreateAsync(user);
                     if (identityResult.Succeeded)
                     {
-                        await AddUserToUsersRoleAsync(user.Email);
+                        await AddUserToRoleAsync(user.Email, "Users");
                         identityResult = await _userManager.AddLoginAsync(user, info);
                         if (identityResult.Succeeded)
                         {

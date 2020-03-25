@@ -18,7 +18,8 @@ namespace ExpenseTracker.Common
     {
         private readonly IEmailSettings _emailSettings;
 
-        public EmailService(IEmailSettings emailSettings)
+        public EmailService(
+            IEmailSettings emailSettings)
         {
             _emailSettings = emailSettings;
         }
@@ -68,7 +69,7 @@ namespace ExpenseTracker.Common
         /// <param name="message">The content of the email message</param>
         /// <param name="recipient">The recipient of the email message</param>
         /// <returns>bool whether the message was successfully sent or not</returns>
-        private async Task<bool> SendMessage(string subject, string message, string recipient)
+        public async Task<bool> SendMessage(string subject, string message, string recipient)
         {
             try
             {
