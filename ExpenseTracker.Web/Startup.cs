@@ -15,7 +15,6 @@ using Hangfire;
 using ExpenseTracker.Biz.IServices;
 using System;
 using Microsoft.Extensions.Logging;
-using Hangfire.SQLite;
 using Npgsql;
 using Hangfire.PostgreSql;
 

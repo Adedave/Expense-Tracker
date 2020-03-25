@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using ExpenseTracker.Data.Domain.Models;
 using ExpenseTracker.Web.Models;
 using Microsoft.EntityFrameworkCore;
+using Hangfire;
+using ExpenseTracker.Biz.IServices;
+using ExpenseTracker.Common;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -22,18 +25,25 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
         private readonly IUserValidator<AppUser> _userValidator;
         private readonly IPasswordValidator<AppUser> _passwordValidator;
         private readonly IPasswordHasher<AppUser> _passwordHasher;
+        private readonly IViewRenderService viewRenderService;
+        private readonly IEmailService emailService;
 
         #endregion
 
-        public AdminController(UserManager<AppUser> userManager,
-                            IUserValidator<AppUser> userValidator,
-                            IPasswordValidator<AppUser> passwordValidator,
-                            IPasswordHasher<AppUser> passwordHasher)
+        public AdminController(
+            UserManager<AppUser> userManager, 
+            IUserValidator<AppUser> userValidator,
+            IPasswordValidator<AppUser> passwordValidator,
+            IPasswordHasher<AppUser> passwordHasher,
+            IViewRenderService viewRenderService,
+            IEmailService emailService)
         {
             _userManager = userManager;
             _userValidator = userValidator;
             _passwordValidator = passwordValidator;
             _passwordHasher = passwordHasher;
+            this.viewRenderService = viewRenderService;
+            this.emailService = emailService;
         }
 
         // GET: /<controller>/
@@ -92,7 +102,11 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
                 if (result.Succeeded)
                 {
                     TempData["Message"] = $"User \"{model.Name}\" was created successfully!";
+                    await AddUserToUsersRoleAsync(user.Email);
 
+                    string cTokenLink = await GenerateEmailTokenAsync(user.Email);
+
+                    await SendConfirmationEmailAsync(user.Email, cTokenLink);
                     return RedirectToAction("Index");
                 }
                 else
@@ -104,6 +118,43 @@ namespace ExpenseTracker.Web.Areas.Admin.Controllers
                 }
             }
             return View(model);
+        }
+
+        private async Task<string> GenerateEmailTokenAsync(string userEmail)
+        {
+            AppUser user = await _userManager.FindByEmailAsync(userEmail);
+
+            string cToken = _userManager.GenerateEmailConfirmationTokenAsync(user).Result;
+
+            string cTokenLink = Url.Action("ConfirmEmail", "Account",
+                values: new { userId = user.Id, token = cToken },
+                protocol: HttpContext.Request.Scheme);
+            return cTokenLink;
+        }
+
+        private async Task SendConfirmationEmailAsync(string email, string cTokenLink)
+        {
+            var appUser = await _userManager.FindByEmailAsync(email);
+            string message = await viewRenderService.RenderToStringAsync("ConfirmEmailTemplate", email);
+            message = message.Replace("{username}", appUser.UserName);
+            message = message.Replace("{email}", appUser.Email);
+            message = message.Replace("{confirmLink}", cTokenLink);
+            var jobId = BackgroundJob.Enqueue(
+                () => emailService.ConfirmEmail(appUser.Email, message));
+        }
+
+        private async Task AddUserToUsersRoleAsync(string userEmail)
+        {
+            AppUser registeredUser = await _userManager.FindByEmailAsync(userEmail);
+            if (registeredUser != null)
+            {
+                IdentityResult result = await _userManager.AddToRoleAsync(registeredUser, "Users");
+
+                if (!result.Succeeded)
+                {
+                    AddErrorsFromResult(result);
+                }
+            }
         }
 
         #region Edit Action Methods
