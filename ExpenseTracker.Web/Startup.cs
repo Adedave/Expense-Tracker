@@ -26,11 +26,16 @@ namespace ExpenseTracker.Web
 {
     public partial class Startup
     {
-        public Startup(IConfiguration configuration, IHostingEnvironment hostingEnvironment)
+        private readonly ILogger<Startup> _logger;
+
+        public Startup(
+            IConfiguration configuration, IHostingEnvironment hostingEnvironment,
+            ILogger<Startup> logger)
         {
             Configuration = configuration;
             FileProvider = hostingEnvironment.ContentRootFileProvider;
             _hostingEnvironment = hostingEnvironment;
+            _logger = logger;
         }
 
         public IConfiguration Configuration { get; }
@@ -178,6 +183,25 @@ namespace ExpenseTracker.Web
             ILoggerFactory loggerFactory, IHttpContextAccessor httpContextAccessor)
         {
             app.UseForwardedHeaders();
+            app.Use(async (context, next) =>
+            {
+                // Request method, scheme, and path
+                _logger.LogDebug("Request Method: {Method}", context.Request.Method);
+                _logger.LogDebug("Request Scheme: {Scheme}", context.Request.Scheme);
+                _logger.LogDebug("Request Path: {Path}", context.Request.Path);
+
+                // Headers
+                foreach (var header in context.Request.Headers)
+                {
+                    _logger.LogDebug("Header: {Key}: {Value}", header.Key, header.Value);
+                }
+
+                // Connection: RemoteIp
+                _logger.LogDebug("Request RemoteIp: {RemoteIpAddress}",
+                    context.Connection.RemoteIpAddress);
+
+                await next();
+            });
             //app.UseDevExpressControls();
             if (env.IsDevelopment())
             {
