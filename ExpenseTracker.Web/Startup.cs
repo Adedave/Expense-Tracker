@@ -19,6 +19,7 @@ using Npgsql;
 using Hangfire.PostgreSql;
 using System.Threading.Tasks;
 using ExpenseTracker.Biz.Infrastructure;
+using ExpenseTracker.Web.Helpers;
 
 namespace ExpenseTracker.Web
 {
@@ -122,6 +123,13 @@ namespace ExpenseTracker.Web
                     googleOptions.ClientSecret = Configuration["OAUTH:providers:0:clientSecret"];
                     googleOptions.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents
                     {
+                        OnRemoteFailure = (context) =>
+                        {
+                            context.Response.Redirect(context.Properties.GetString("returnUrl"));
+                            context.HandleResponse();
+                            return Task.CompletedTask;
+                        },
+
                         OnRedirectToAuthorizationEndpoint = redirectContext =>
                         {
                             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development")
@@ -141,7 +149,7 @@ namespace ExpenseTracker.Web
                 });
             }
 
-            
+            services.AddHttpContextAccessor();
             
             // Automatically perform database migration
             services.BuildServiceProvider().GetService<ExpenseTrackerDbContext>().Database.Migrate();
@@ -160,7 +168,9 @@ namespace ExpenseTracker.Web
         }
         
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(
+            IApplicationBuilder app, IHostingEnvironment env,
+            ILoggerFactory loggerFactory, IHttpContextAccessor httpContextAccessor)
         {
             //app.UseDevExpressControls();
             if (env.IsDevelopment())
@@ -178,7 +188,7 @@ namespace ExpenseTracker.Web
             
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
-                Authorization = new[] { new HangfireAuthorizationFilter() },
+                Authorization = new[] { new HangfireDashboardAuthorizationFilter() },
                 //Back to site app url
             });
             var options = new BackgroundJobServerOptions { WorkerCount = 2 };
@@ -188,6 +198,7 @@ namespace ExpenseTracker.Web
             RecurringJob.AddOrUpdate<IReminderService>(
                         reminderEmail => reminderEmail.SendReminderEmail(), Cron.Minutely()
                         );
+
             RecurringJob.AddOrUpdate<IExpenseService>(
                         expenses => expenses.SendMonthlyReport(), Cron.Monthly(1, 6, 30)
                         );

@@ -261,7 +261,7 @@ namespace ExpenseTracker.Web.Controllers
         public IActionResult ExternalLogin(string provider, string returnUrl)
         {
             string redirectUrl = Url.Action("ExternalLoginCallback", "Account",
-            new { ReturnUrl = returnUrl });
+            new { ReturnUrl = returnUrl }, Request.Scheme);
             var properties = _signInManager
             .ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);

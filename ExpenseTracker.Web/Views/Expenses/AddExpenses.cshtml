@@ -40,7 +40,7 @@
 
             <div class="form-group">
                 <label asp-for="ExpenseCategoryId" class="control-label">Expense Category*</label>
-                @Html.DropDownList("ExpenseCategoryId", new SelectList(Categories.GetCategories(Model.AppUserId), "Id", "Name", Model.ExpenseCategoryId), "select  category", new { id = "ExpenseCategoryId", @class = "validate-select form-control" })
+                @Html.DropDownList("ExpenseCategoryId", new SelectList(Categories.GetCategories(Model.AppUserId), "Id", "Name", Model.ExpenseCategoryId), "select  category", new { id = "ExpenseCategoryId", @class = "validate-select form-control", @required = true })
                 <span asp-validation-for="ExpenseCategoryId" class="text-danger"></span>
             </div>
             <br />
