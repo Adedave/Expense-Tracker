@@ -123,12 +123,12 @@ namespace ExpenseTracker.Web
                     googleOptions.ClientSecret = Configuration["OAUTH:providers:0:clientSecret"];
                     googleOptions.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents
                     {
-                        OnRemoteFailure = (context) =>
-                        {
-                            context.Response.Redirect(context.Properties.GetString("returnUrl"));
-                            context.HandleResponse();
-                            return Task.CompletedTask;
-                        },
+                        //OnRemoteFailure = (context) =>
+                        //{
+                        //    context.Response.Redirect(context.Properties.GetString("returnUrl"));
+                        //    context.HandleResponse();
+                        //    return Task.CompletedTask;
+                        //},
 
                         OnRedirectToAuthorizationEndpoint = redirectContext =>
                         {
@@ -179,9 +179,10 @@ namespace ExpenseTracker.Web
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseDeveloperExceptionPage();
+                //app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                //app.UseHsts();
             }
 
             //loggerFactory.AddFile("Logs/cyberspace{Date}.txt");
@@ -206,7 +207,7 @@ namespace ExpenseTracker.Web
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             //app.UseStatusCodePages();
-            app.UseCookiePolicy();
+            //app.UseCookiePolicy();
 
             app.UseAuthentication();
 
