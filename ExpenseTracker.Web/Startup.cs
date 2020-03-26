@@ -20,6 +20,7 @@ using Hangfire.PostgreSql;
 using System.Threading.Tasks;
 using ExpenseTracker.Biz.Infrastructure;
 using ExpenseTracker.Web.Helpers;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace ExpenseTracker.Web
 {
@@ -153,8 +154,12 @@ namespace ExpenseTracker.Web
             
             // Automatically perform database migration
             services.BuildServiceProvider().GetService<ExpenseTrackerDbContext>().Database.Migrate();
-            
 
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
 
             services.AddMvc(options =>
             { 
@@ -172,6 +177,7 @@ namespace ExpenseTracker.Web
             IApplicationBuilder app, IHostingEnvironment env,
             ILoggerFactory loggerFactory, IHttpContextAccessor httpContextAccessor)
         {
+            app.UseForwardedHeaders();
             //app.UseDevExpressControls();
             if (env.IsDevelopment())
             {
