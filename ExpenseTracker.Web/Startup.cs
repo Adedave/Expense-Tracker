@@ -134,25 +134,25 @@ namespace ExpenseTracker.Web
                     googleOptions.ClientSecret = Configuration["OAUTH:providers:0:clientSecret"];
                     //googleOptions.NonceCookie.SameSite = (SameSiteMode)(-1);
                     googleOptions.CorrelationCookie.SameSite = (SameSiteMode)(-1);
-                    //googleOptions.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents
-                    //{
-                    //    //OnRemoteFailure = (context) =>
-                    //    //{
-                    //    //    context.Response.Redirect(context.Properties.GetString("returnUrl"));
-                    //    //    context.HandleResponse();
-                    //    //    return Task.CompletedTask;
-                    //    //},
+                    googleOptions.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents
+                    {
+                        //OnRemoteFailure = (context) =>
+                        //{
+                        //    context.Response.Redirect(context.Properties.GetString("returnUrl"));
+                        //    context.HandleResponse();
+                        //    return Task.CompletedTask;
+                        //},
 
-                    //    //OnRedirectToAuthorizationEndpoint = redirectContext =>
-                    //    //{
-                    //    //    if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development")
-                    //    //    {
-                    //    //        //Force scheme of redirect URI (THE IMPORTANT PART)
-                    //    //        redirectContext.RedirectUri = redirectContext.RedirectUri.Replace("http://", "https://", StringComparison.OrdinalIgnoreCase);
-                    //    //    }
-                    //    //    return Task.FromResult(0);
-                    //    //}
-                    //};
+                        OnRedirectToAuthorizationEndpoint = redirectContext =>
+                        {
+                            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development")
+                            {
+                                //Force scheme of redirect URI (THE IMPORTANT PART)
+                                redirectContext.RedirectUri = redirectContext.RedirectUri.Replace("http://", "https://", StringComparison.OrdinalIgnoreCase);
+                            }
+                            return Task.FromResult(0);
+                        }
+                    };
                     //googleOptions.CallbackPath = "/Account/ExternalLoginCallback";
                 })
                 .AddFacebook(facebookOptions =>
@@ -241,10 +241,10 @@ namespace ExpenseTracker.Web
                         expenses => expenses.SendMonthlyReport(), Cron.Monthly(1, 6, 30)
                         );
 
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
             //app.UseStatusCodePages();
-            //app.UseCookiePolicy();
+            app.UseCookiePolicy();
 
             app.UseAuthentication();
 
