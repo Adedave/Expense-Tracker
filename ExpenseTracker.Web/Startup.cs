@@ -269,7 +269,7 @@ namespace ExpenseTracker.Web
             {
                 var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
                 // TODO: Use your User Agent library of choice here.
-                if (userAgent.Contains("Chrome/8")
+                if (!userAgent.Contains("Chrome/8")
                     /* UserAgent doesn’t support new behavior */
                     )
                 {
