@@ -127,6 +127,8 @@ namespace ExpenseTracker.Web
                 {
                     googleOptions.ClientId = Configuration["OAUTH:providers:0:clientId"];
                     googleOptions.ClientSecret = Configuration["OAUTH:providers:0:clientSecret"];
+                    //googleOptions.NonceCookie.SameSite = (SameSiteMode)(-1);
+                    googleOptions.CorrelationCookie.SameSite = (SameSiteMode)(-1);
                     //googleOptions.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents
                     //{
                     //    //OnRemoteFailure = (context) =>
