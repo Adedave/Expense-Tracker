@@ -49,7 +49,12 @@ namespace ExpenseTracker.Web
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
+                //options.MinimumSameSitePolicy = SameSiteMode.None;
+                options.MinimumSameSitePolicy = (SameSiteMode)(-1);
+                options.OnAppendCookie = cookieContext =>
+                    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+                options.OnDeleteCookie = cookieContext =>
+                    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
             });
 
             services.ConfigureApplicationCookie(opts => opts.LoginPath = "/Account/Login");
@@ -256,6 +261,22 @@ namespace ExpenseTracker.Web
             });
 
             CreateAdmin.CreateAdminAccount(app.ApplicationServices, Configuration).Wait();
+        }
+
+        private void CheckSameSite(HttpContext httpContext, CookieOptions options)
+        {
+            if (options.SameSite == SameSiteMode.None)
+            {
+                var userAgent = httpContext.Request.Headers["User-Agent"].ToString();
+                // TODO: Use your User Agent library of choice here.
+                if (userAgent.Contains("Chrome/8")
+                    /* UserAgent doesn’t support new behavior */
+                    )
+                {
+                    // For .NET Core < 3.1 set SameSite = (SameSiteMode)(-1)
+                    options.SameSite = (SameSiteMode)(-1);
+                }
+            }
         }
     }
 }
