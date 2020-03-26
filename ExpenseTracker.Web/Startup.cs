@@ -210,7 +210,7 @@ namespace ExpenseTracker.Web
                         expenses => expenses.SendMonthlyReport(), Cron.Monthly(1, 6, 30)
                         );
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
             //app.UseStatusCodePages();
             //app.UseCookiePolicy();
