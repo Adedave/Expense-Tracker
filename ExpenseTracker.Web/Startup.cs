@@ -121,25 +121,25 @@ namespace ExpenseTracker.Web
                 {
                     googleOptions.ClientId = Configuration["OAUTH:providers:0:clientId"];
                     googleOptions.ClientSecret = Configuration["OAUTH:providers:0:clientSecret"];
-                    googleOptions.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents
-                    {
-                        //OnRemoteFailure = (context) =>
-                        //{
-                        //    context.Response.Redirect(context.Properties.GetString("returnUrl"));
-                        //    context.HandleResponse();
-                        //    return Task.CompletedTask;
-                        //},
+                    //googleOptions.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents
+                    //{
+                    //    //OnRemoteFailure = (context) =>
+                    //    //{
+                    //    //    context.Response.Redirect(context.Properties.GetString("returnUrl"));
+                    //    //    context.HandleResponse();
+                    //    //    return Task.CompletedTask;
+                    //    //},
 
-                        OnRedirectToAuthorizationEndpoint = redirectContext =>
-                        {
-                            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development")
-                            {
-                                //Force scheme of redirect URI (THE IMPORTANT PART)
-                                redirectContext.RedirectUri = redirectContext.RedirectUri.Replace("http://", "https://", StringComparison.OrdinalIgnoreCase);
-                            }
-                            return Task.FromResult(0);
-                        }
-                    };
+                    //    //OnRedirectToAuthorizationEndpoint = redirectContext =>
+                    //    //{
+                    //    //    if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development")
+                    //    //    {
+                    //    //        //Force scheme of redirect URI (THE IMPORTANT PART)
+                    //    //        redirectContext.RedirectUri = redirectContext.RedirectUri.Replace("http://", "https://", StringComparison.OrdinalIgnoreCase);
+                    //    //    }
+                    //    //    return Task.FromResult(0);
+                    //    //}
+                    //};
                     //googleOptions.CallbackPath = "/Account/ExternalLoginCallback";
                 })
                 .AddFacebook(facebookOptions =>
