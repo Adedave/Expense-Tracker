@@ -223,11 +223,11 @@ namespace ExpenseTracker.Web
             }
 
             //loggerFactory.AddFile("Logs/cyberspace{Date}.txt");
-            
+
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
                 Authorization = new[] { new HangfireDashboardAuthorizationFilter() },
-                //Back to site app url
+                //back to site app url
             });
             var options = new BackgroundJobServerOptions { WorkerCount = 2 };
             app.UseHangfireServer(options);
@@ -243,7 +243,7 @@ namespace ExpenseTracker.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            //app.UseStatusCodePages();
+            app.UseStatusCodePages();
             app.UseCookiePolicy();
 
             app.UseAuthentication();

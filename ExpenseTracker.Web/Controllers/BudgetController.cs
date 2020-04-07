@@ -20,7 +20,8 @@ namespace ExpenseTracker.Web.Controllers
         private readonly IExpenseCategoryService _expenseCategoryService;
         private readonly UserManager<AppUser> _userManager;
 
-        public BudgetController(IBudgetService budgetService,
+        public BudgetController(
+            IBudgetService budgetService,
              IExpenseCategoryService expenseCategoryService, 
              UserManager<AppUser> userManager)
         {
@@ -56,7 +57,7 @@ namespace ExpenseTracker.Web.Controllers
             return View(budgets);
         }
         
-        public async Task<IActionResult> CreateBudget(int categoryId,string month, string year)
+        public async Task<IActionResult> CreateBudget(int categoryId, string month, string year)
         {
             var user = await GetCurrentUser();
 

@@ -15,6 +15,7 @@
     </div>
 }
 <h3><span class="text-danger">@{var exc = ViewBag.BudgetMessage ?? "";} @exc</span></h3>
+
 @if (!(ViewBag.IsBudgetSet ?? true))
 {
     <p class="text-danger">
@@ -26,17 +27,20 @@
         </strong>
     </p>
 }
-<div>
-    <hr />
     <div>
-        <span><strong>Expense Name:</strong> @Model.NameOfExpense</span><br />
-        <span><strong>Expense Cost:</strong>@{var toal = Model.CostOfExpense.ToString("0,0.00"); }
-                    @("\u20A6") @toal</span><br />
-        <span><strong>Expense Category:</strong>  @Categories.GetCategoryById(Model.ExpenseCategoryId).Name</span><br />
-        <span><strong>Expense Description:</strong>  @Model.MoreDescription</span><br />
-        <span><strong>Expense Date:</strong>  @Model.DateOfExpense.ToString("dd-MM-yyyy")</span><br />
+        <a class="btn btn-yellow" asp-action="AddExpenses">Add New Expense</a>
+        <hr />
+        <div>
+            <span><strong>Expense Name:</strong> @Model.NameOfExpense</span><br />
+            <span>
+                <strong>Expense Cost:</strong>@{var toal = Model.CostOfExpense.ToString("0,0.00"); }
+                @("\u20A6") @toal
+            </span><br />
+            <span><strong>Expense Category:</strong>  @Categories.GetCategoryById(Model.ExpenseCategoryId).Name</span><br />
+            <span><strong>Expense Description:</strong>  @Model.MoreDescription</span><br />
+            <span><strong>Expense Date:</strong>  @Model.DateOfExpense.ToString("dd-MM-yyyy")</span><br />
+        </div>
     </div>
-</div>
 <div>
     <br/>
     <a class="btn btn-yellow" asp-action="Index">Back to List</a>

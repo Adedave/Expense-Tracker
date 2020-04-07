@@ -265,3 +265,6 @@ paket-files/
 __pycache__/
 *.pyc
 /app
+
+# VSCode Tools
+.vscode/

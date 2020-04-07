@@ -28,8 +28,10 @@ namespace ExpenseTracker.Web.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly IBudgetService _budgetService;
 
-        public ExpensesCategoryController(IExpenseCategoryService expenseCategoryService,
-            ExpenseTrackerDbContext context, ILogger<ExpensesCategoryController> logger,
+        public ExpensesCategoryController(
+            IExpenseCategoryService expenseCategoryService,
+            ExpenseTrackerDbContext context, 
+            ILogger<ExpensesCategoryController> logger,
             UserManager<AppUser> userManager, 
             IBudgetService budgetService)
         {
@@ -60,21 +62,23 @@ namespace ExpenseTracker.Web.Controllers
                 return NotFound("Category not found");
             }
 
-            var budget = await GetCategoryBudget(id,month,year);
-
+            var budget = GetCategoryBudget(id, user?.Id, month,year);
+            if (budget is null)
+            {
+                ViewBag.IsBudgetSet = false;
+            }
             DateTime currentMonth = Convert.ToDateTime(month + year);
             ViewBag.CurrentMonth = currentMonth;
             ViewBag.PreviousMonth = currentMonth.AddMonths(-1);
             ViewBag.NextMonth = currentMonth.AddMonths(1);
-            ViewBag.Budget = budget?.Amount.ToString("0,0.00");
+            ViewBag.Budget = budget!= null? budget?.Amount.ToString("0,0.00") : "0.00";
 
             return View(category);
         }
 
-        private async Task<Budget> GetCategoryBudget(int id,string month, string year)
+        private Budget GetCategoryBudget(int id,string userId, string month, string year)
         {
-            var user = await GetCurrentUser();
-            return _budgetService.GetByCategory(id,user.Id,month,year);
+            return _budgetService.GetByCategory(id,userId,month,year);
         }
 
         public async Task<IActionResult> GetCategory(int id)

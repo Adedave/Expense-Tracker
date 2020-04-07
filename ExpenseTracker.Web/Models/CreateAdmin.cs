@@ -30,7 +30,7 @@ namespace ExpenseTracker.Web
             RoleManager<IdentityRole> roleManager =
             serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             string username = "Admin";
-            string role = "Admin";
+            string role = "Admins";
 
             if (await userManager.FindByNameAsync(username) == null)
             {

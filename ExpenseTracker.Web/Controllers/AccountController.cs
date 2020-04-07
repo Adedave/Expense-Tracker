@@ -10,6 +10,7 @@ using ExpenseTracker.Biz.IServices;
 using Hangfire;
 using System.Linq;
 using ExpenseTracker.Web.Configuration;
+using System.Net.Http;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -47,6 +48,42 @@ namespace ExpenseTracker.Web.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
+            return View();
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> SigninFast([FromQuery] string identifier, string oth, int challengeId)
+        {
+            using (HttpClient httpClient = new HttpClient())
+            {
+                var requestUri = "https://api.fast.co/api/verify/?" +
+                    $"challengeId={challengeId}" +
+                    $"&oth={oth}&identifier={identifier}&key=DVPRAX1WzOeEwpg9VQZbN2Ly8v46Ylg7" +
+                    $"&secret=QEP5FBsewKnq5Q8J5njrcixauR3mi8xp";
+                var response = await httpClient.GetAsync(requestUri);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    AppUser user = new AppUser
+                    {
+                        UserName = identifier,
+                        Email = identifier,
+                        IsActive = true
+                    };
+                    IdentityResult identityResult = await _userManager.CreateAsync(user);
+                    if (identityResult.Succeeded)
+                    {
+                        await AddUserToRoleAsync(user.Email, "Users");
+
+                        await _signInManager.SignOutAsync();
+
+                        await _signInManager.SignInAsync(user, false);
+                    }
+
+                    return LocalRedirect("/");
+                }
+            }
+            
             return View();
         }
 
@@ -207,10 +244,10 @@ namespace ExpenseTracker.Web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl)
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Index", "Home");
-            }
+            //if (User.Identity.IsAuthenticated)
+            //{
+            //    return RedirectToAction("Index", "Home");
+            //}
             LoginViewModel loginViewModel = new LoginViewModel
             {
                 ReturnUrl = returnUrl,

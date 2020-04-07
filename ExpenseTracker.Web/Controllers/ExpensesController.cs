@@ -137,13 +137,14 @@ namespace ExpenseTracker.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> AddExpenses()
+        public async Task<IActionResult> AddExpenses(int categoryId)
         {
             var user = await GetCurrentUser();
             
             Expense expenses = new Expense()
             {
-                AppUserId = user.Id
+                AppUserId = user.Id,
+                ExpenseCategoryId = categoryId
             };
 
             return View(expenses);
