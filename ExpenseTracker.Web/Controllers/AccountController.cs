@@ -262,11 +262,6 @@ namespace ExpenseTracker.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel details, string returnUrl)
         {
-            if(User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
             if (ModelState.IsValid)
             {
                 AppUser user = await _userManager.FindByEmailAsync(details.Email);
